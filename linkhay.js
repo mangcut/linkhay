@@ -31,9 +31,21 @@
 	var giphy = function(){
 		$(".V2-comments .V2-comment-item .V2-comment-body a[title*='/media.giphy.com/media/']").each(function(){
 			var $t = $(this);
-			$("<img />").hide().attr("src", $t.attr("title")).on("load", function(){
-				$t.replaceWith($("<p />").append($(this)));
-				$(this).slideDown("fast");
+			$("<img />").attr("src", $t.attr("title")).on("load", function(){
+				$i = $(this); 
+				$t.text("Đóng/mở GIF")
+					.after($("<p />").hide().css("margin", "0.5rem 0").append($i));
+				$t.css({
+					"background": "antiquewhite",
+					"margin":"0 5px",
+					"border-radius":"3px",
+					"padding":"2px 6px",
+					"font-size":"0.6rem"
+				});
+				$t.on("click", function(event){
+					event.preventDefault();
+					$i.parent().slideToggle("fast");
+				});
 			});
 		});
 	}

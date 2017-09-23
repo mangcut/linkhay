@@ -727,7 +727,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		if (url.indexOf("http") === 0) return url;
 		
 		var protocol = "http://";
-		if (!!fullUrl && fullUrl.indexOf("https://" === 0)) {
+		if (!!fullUrl && fullUrl.indexOf("https://") === 0) {
 			protocol =  "https://";
 		}
 		return protocol + url;
@@ -845,12 +845,13 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		$("#qvLinkDiv_").show();
 	}
 	
-	var load = function(url, site, url){
+	var load = function(url, site){
 		$.get({
 			url: url,
 			dataType: "html"
 		}).fail(function(jqXHR, textStatus, errorThrown){
 			console.log(textStatus + " (" + jqXHR.status + "): " + errorThrown);
+			console.log(url);
 		}).done(function(html){
 			process(html, site, url);
 		});
@@ -870,13 +871,13 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 				var start = html.indexOf("window.location.href=") + "window.location.href=".length + 1;
 				var end = html.indexOf("' + window.location.hash");
 				var newUrl = ensureProtocol(site.domain, url) + html.substring(start, end);
-				load(newUrl, site, url);
+				load(newUrl, site);
 			} else {
 				process(html, site, url);
 			}
 		});
 	} else {
-		load(url,site, url);
+		load(url,site);
 	}
 	
 })(jQuery);
