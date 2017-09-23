@@ -7,9 +7,6 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		} else {
 			$("<video controls />")
 				.append($("<source />")
-				.on("load", function(){
-					alert("ok");
-				})
 				.on("error", function(){
 					var $p = $("<p />").addClass("caption_");
 					var $error = $("<span />").text("Không xem được clip? ");
