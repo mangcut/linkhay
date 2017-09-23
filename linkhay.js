@@ -1,6 +1,7 @@
 (function($){
 	
-	// check if this is a normal-link detailed page
+	// check if this is a normal-link detailed page 
+	// that is, not index, media, or note page
 	var isNormalDetailedPage = ($(".V2-link-voter-list").length === 1 &&
 		$("#admrecommen").length === 1 &&
 		$(".link-summary .link-info .info .source").length === 1 &&
@@ -8,22 +9,25 @@
 	
 	if (!isNormalDetailedPage) return;
 	
+	// already had built-in preview pane (like youtube link)
 	var hasAppContent = ($(".link-summary .app-content").length > 0);
 	
-	// hide the trash
+	// hide the trash (ads, fb, etc.)
 	//$(".top-adv, .V2-old-style-sidebar-box, .controls, .fb-box").remove();
 	$(".top-adv, .fb-box").remove();
 	$("#admzone449, #admzone963, #admzone3174").parent().parent().remove();
 	$(".ads-links-recommend").hide();
 	
+	// fix the avatar display in case user has no avatar
 	var $img = $(".link-info .info a.user-link img");
 	$img.attr("alt", $img.attr("alt").slice(0, 2).toUpperCase());
 	
+	// fix avatar in voter list
 	$(".V2-link-voter-list li a img").each(function(){
 		$(this).attr("alt", $(this).attr("alt").slice(0, 2).toUpperCase());
 	});
 	
-	// convert some giphy
+	// function for convert some giphy
 	var giphy = function(){
 		$(".V2-comments .V2-comment-item .V2-comment-body a[title*='/media.giphy.com/media/']").each(function(){
 			var $t = $(this);
@@ -34,22 +38,32 @@
 		});
 	}
 	
+	// convert GIF at page load
+	giphy();
+	
+	// convert GIF when user submits comments
 	$(".V2-comments").on("click", ".V2-comment-frm .submit", function(){
 		window.setTimeout(giphy, 1500);
 		// backup :)
 		window.setTimeout(giphy, 5000);
 	});
-	
-	giphy();
-	
-	// already has preview, like youtube, then no need to add
+		
+	// already has preview (youtube page), then nothing left to do -> quit
 	if (hasAppContent) return;
 	
+	// NOW, build the preview panel
+	
+	// first get the URL to fetch
 	var url = $("#admrecommen").data("url").toLowerCase();
 	if (!url) return;
 
+	// make link URL direct (skip Linkhay server - just micro optimization :)
 	$(".link-info .title h1 a").attr("href", url);
-		
+
+	//
+  // Build the tags for preview pane
+	//
+	
 	var $ivLink = $("<div id='qvLinkDiv_' style='display:none;margin-top:1rem'><button id='qvLink_'  style='background:#C00607;color:#f8f8f8;border-radius:3px;border:0;padding:4px 8px;font-size:0.75rem;cursor:pointer'>&#9889; Xem nhanh &#9889;</button></div>");
 	$(".link-summary").append($ivLink);
 	
@@ -68,6 +82,7 @@
 	$qv.append($style).append($qvDate).append($qvTitle).append($qvLead).append($qvLeadImg).append($qvLeadImgCaption).append($qvContent).append($qvBottomBar).append($qvOverlay);
 	$(".link-summary").append($qv);
 
+	// Quick View button
 	$("#qvLink_").click(function(event){
 		event.preventDefault();
 		if ($("#qvDiv_").height() >= 1120) {
@@ -75,6 +90,8 @@
 				"overflow": "hidden",
 				"max-height": "960px"
 			});
+			
+			// Show the "read more" button panel
 			$("#qvOverlay_").show("slow");
 		}
 		$("#qvDiv_").slideToggle("fast");
@@ -86,9 +103,9 @@
 		window.scrollTo(0, 0);
 	});
 	
+	// "Read more" button
 	$("#qvMore_").click(function(event){
 		event.preventDefault();
-		$("#qvDiv_").sc
 		$("#qvDiv_").css({
 			"overflow": "visible",
 			"max-height": "none"
