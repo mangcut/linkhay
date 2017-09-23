@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "LinkHay QuickView",
+  "version": "1.0.6",
+  "description": "Cho phép xem nhanh trong LinkHay.com",
+  "icons": {"192": "icon.png"},
+  "permissions": [
+	"tabs", "http://*/*", "https://*/*"
+   ],
+  "browser_action": {
+    "default_icon": "icon.png",
+	"default_title": "LinkHay QuickView",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts":
+    [
+		{
+            "matches": ["http://*.linkhay.com/*", "https://*.linkhay.com/*"],
+            "js": ["jquery-3.2.1.min.js", "linkhay.js"],
+			"run_at" : "document_end"
+        }
+    ]
+}
