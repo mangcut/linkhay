@@ -1,5 +1,5 @@
-# linkhay
-Quick View - Tiện ích mở rộng dành cho trình duyệt (browser extension).
+# QuickView Extension for LinkHay
+Tiện ích mở rộng dùng cho trình duyệt (browser extension).
 
 Dành cho bạn đọc của [LinkHay.com](http://LinkHay.com).
 
