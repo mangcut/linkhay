@@ -36,11 +36,11 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		$content.find(anchor).each(function(){
 			var $anchor = $(this);
 			
-			$src = $anchor;
+			var $src = $anchor;
 			!!src && ($src = $src.find(src));
 			var clipSrc = $src.attr(srcAttr);
 			
-			$target = $anchor;
+			var $target = $anchor;
 			!!target && ($target = $target.find(target).first());
 			
 			// remove the thumbnail if any
@@ -48,6 +48,22 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 			
 			// add video
 			insertClip(useIframe, clipSrc, $target);
+		});
+	}
+	
+	var clipVNExpress = function($content){
+		//https://video.vnexpress.net/parser.html?id=166960&t=2
+		// now check for embeded video
+		$content.find("div[data-component-type='video']").each(function(){
+			var clipID = $(this).attr("data-component-value");
+			var clipType = $(this).attr("data-component-typevideo");
+			var clipSrc = "https://video.vnexpress.net/parser.html?id=" + clipID + "&t=" + clipType;
+			var useIframe = true;
+			var $clipDiv = $(this).closest("div");
+			// remove the thumbnail if any
+			$clipDiv.parent().find("img, a").remove();
+			// add video
+			insertClip(useIframe, clipSrc, $clipDiv);
 		});
 	}
 		
@@ -179,19 +195,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		dynamic:  function($content) {
 			$content.find(".subtitle").addClass("b_");
 			$content.find("table p").css("padding", "3px 5px");
-			//https://video.vnexpress.net/parser.html?id=166960&t=2
-			// now check for embeded video
-			$content.find("div[data-component-type='video']").each(function(){
-				var clipID = $(this).attr("data-component-value");
-				var clipType = $(this).attr("data-component-typevideo");
-				var clipSrc = "https://video.vnexpress.net/parser.html?id=" + clipID + "&t=" + clipType;
-				var useIframe = true;
-				var $clipDiv = $(this).closest("div");
-				// remove the thumbnail if any
-				$clipDiv.parent().find("img, a").remove();
-				// add video
-				insertClip(useIframe, clipSrc, $clipDiv);
-			});
+			clipVNExpress($content);
 		}
 	},
 	
@@ -209,21 +213,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: "table, .item_slide_show",
 		remove: "",
 		hide: "",
-		dynamic:  function($content) {
-			//https://video.vnexpress.net/parser.html?id=166960&t=2
-			// now check for embeded video
-			$content.find("div[data-component-type='video']").each(function(){
-				var clipID = $(this).attr("data-component-value");
-				var clipType = $(this).attr("data-component-typevideo");
-				var clipSrc = "https://video.vnexpress.net/parser.html?id=" + clipID + "&t=" + clipType;
-				var useIframe = true;
-				var $clipDiv = $(this).closest("div");
-				// remove the thumbnail if any
-				$clipDiv.parent().find("img, a").remove();
-				// add video
-				insertClip(useIframe, clipSrc, $clipDiv);
-			});
-		}
+		dynamic: clipVNExpress
 	},
 	
 	{

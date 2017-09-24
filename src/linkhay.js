@@ -27,7 +27,7 @@
 		$(this).attr("alt", $(this).attr("alt").slice(0, 2).toUpperCase());
 	});
 	
-	// function for convert some giphy
+	// function for converting some giphy
 	var giphy = function(){
 		$(".V2-comments .V2-comment-item .V2-comment-body a[title*='/media.giphy.com/media/']").not(".done_").each(function(){
 			var $t = $(this).addClass("done_");
@@ -57,8 +57,8 @@
 	// convert GIF when user submits comments
 	$(".V2-comments").on("click", ".V2-comment-frm .submit", function(){
 		window.setTimeout(giphy, 1500);
-		// backup :)
-		window.setTimeout(giphy, 5000);
+		// backup, in case of delay :)
+		window.setTimeout(giphy, 10000);
 	});
 		
 	// already has preview (youtube page), then nothing left to do -> quit
