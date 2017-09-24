@@ -7,8 +7,8 @@ Thêm nút "Xem nhanh" vào màn hình để xem bài viết siêu nhanh ngay tr
 
 <a href="https://chrome.google.com/webstore/detail/linkhay-quickview/jdiingledcmkbdenjnfelcoomapkcbpm?hl=vi"><img src="screenshot.png" alt="Screenshot"></img></a>
 
-[Link cài đặt trên Google Chrome Store](https://chrome.google.com/webstore/detail/linkhay-quickview/jdiingledcmkbdenjnfelcoomapkcbpm?hl=vi)
+[Link cài đặt trên Google Chrome Store (dùng được cho cả Cốc Cốc)](https://chrome.google.com/webstore/detail/linkhay-quickview/jdiingledcmkbdenjnfelcoomapkcbpm?hl=vi)
 
-Extension cần quyền truy cập các trang web để tạo bản "Xem nhanh" (CORS). Ngoài ra,  không làm gì khác.
+QuickView cần quyền truy cập các trang web để tạo bản "Xem nhanh" (CORS). Ngoài ra,  không làm gì khác.
 
 Phát triển bởi [Măng Cụt Labs](http://www.mangcut.vn/) ([@thinker](http://linkhay.com/u/thinker) trên LinkHay).
