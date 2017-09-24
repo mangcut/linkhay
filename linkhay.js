@@ -29,11 +29,12 @@
 	
 	// function for convert some giphy
 	var giphy = function(){
-		$(".V2-comments .V2-comment-item .V2-comment-body a[title*='/media.giphy.com/media/']").each(function(){
-			var $t = $(this);
+		$(".V2-comments .V2-comment-item .V2-comment-body a[title*='/media.giphy.com/media/']").not(".done_").each(function(){
+			var $t = $(this).addClass("done_");
+			
 			$("<img />").attr("src", $t.attr("title")).on("load", function(){
 				$i = $(this); 
-				$t.text("Đóng/mở GIF")
+				$t.text("Mở/đóng GIF")
 					.after($("<p />").hide().css("margin", "0.5rem 0").append($i));
 				$t.css({
 					"background": "antiquewhite",
