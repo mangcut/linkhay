@@ -1,72 +1,5 @@
 window.KnownSites_ = window.KnownSites_ || (function($){
 	
-	var insertClip = function(useIframe, clipSrc, $target) {
-		if (!!useIframe) {
-			$("<iframe allowfullscreen frameborder='0' scrolling='no' style='width:640px;height:360px;margin-left:-1rem' />")
-			.attr("src", clipSrc).prependTo($target);
-		} else {
-			$("<video controls />")
-				.append($("<source />")
-				.on("error", function(){
-					var $p = $("<p />").addClass("caption_");
-					var $error = $("<span />").text("Không xem được clip? ");
-					var $a = $("<a />").attr("href", "#").text("Mở trong tab mới").css({
-						"text-decoration": "underline",
-						"color": "#c00"
-					});
-					$a.on("click", function(event){
-						event.preventDefault();
-						chrome.runtime.sendMessage({cmdID: "createTab", url: clipSrc});
-					});
-					$target.append($p.append($error).append($a));
-				})
-				.attr("src", clipSrc))
-				.prependTo($target);
-		}
-		
-		return $target;
-	}
-	
-	var clip = function($content){
-		doClip($content, "div[type='VideoStream']", null, "data-src", "div", "img, a", true);
-	}
-	
-	var doClip = function($content, anchor, src, srcAttr, target, thumbnail, useIframe){
-		// now check for embeded video
-		$content.find(anchor).each(function(){
-			var $anchor = $(this);
-			
-			var $src = $anchor;
-			!!src && ($src = $src.find(src));
-			var clipSrc = $src.attr(srcAttr);
-			
-			var $target = $anchor;
-			!!target && ($target = $target.find(target).first());
-			
-			// remove the thumbnail if any
-			!!thumbnail && $anchor.find(thumbnail).remove();
-			
-			// add video
-			insertClip(useIframe, clipSrc, $target);
-		});
-	}
-	
-	var clipVNExpress = function($content){
-		//https://video.vnexpress.net/parser.html?id=166960&t=2
-		// now check for embeded video
-		$content.find("div[data-component-type='video']").each(function(){
-			var clipID = $(this).attr("data-component-value");
-			var clipType = $(this).attr("data-component-typevideo");
-			var clipSrc = "https://video.vnexpress.net/parser.html?id=" + clipID + "&t=" + clipType;
-			var useIframe = true;
-			var $clipDiv = $(this).closest("div");
-			// remove the thumbnail if any
-			$clipDiv.parent().find("img, a").remove();
-			// add video
-			insertClip(useIframe, clipSrc, $clipDiv);
-		});
-	}
-		
 	var sites = [
 	{
 		domain: "tuoitre.vn",
@@ -82,7 +15,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: ".VCSortableInPreviewMode",
 		remove: "div[type='RelatedOneNews'], div[type='RelatedNews']",
 		hide: "",
-		dynamic: clip
+		dynamic: Util_.clip
 	},
 	
 	{
@@ -99,12 +32,13 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: ".VCSortableInPreviewMode",
 		remove: ".link-content-footer",
 		hide: "",
-		dynamic: clip
+		dynamic: Util_.clip
 	},
 	
 	{
 		domain: "cafef.vn",
 		title: ".totalcontentdetail h1.title",
+		source: ".source",
 		author: ".author",
 		date: ".totalcontentdetail .dateandcat .pdate",
 		lead: ".totalcontentdetail .sapo",
@@ -116,7 +50,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: ".VCSortableInPreviewMode",
 		remove: ".tindnd, .tinlienquan, .link-content-footer, .chisochungkhoan",
 		hide: "",
-		dynamic: clip
+		dynamic: Util_.clip
 	},
 	
 	{
@@ -129,13 +63,13 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "#contentAvatar figure.caption",
 		content: "#abody",
 		quote: "",
+		p: ">div",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
-		media: ".VCSortableInPreviewMode",
+		media: ".VCSortableInPreviewMode, table.imagefull",
 		remove: "article.story, .morenews",
 		hide: "",
 		dynamic: function($content) {
-			$content.find(">div").addClass("p_");
-			doClip($content, ".player-effect", ".video-effect a", "video", ".video-effect", "img, a", false);
+			Util_.doClip($content, ".player-effect", ".video-effect a", "video", ".video-effect", "img, a", false);
 		}
 	},
 	
@@ -174,7 +108,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		dynamic: function($content, $html) {
 			var clipSrc = $html.find("#content_script script").text().match(/s720:(.*.mp4)/g)[0].substr(7);
 			var useIframe = false;
-			return insertClip(useIframe, clipSrc, $("<div class='media_' />"));
+			return Util_.insertClip(useIframe, clipSrc, $("<div class='media_' />"));
 		}
 	},
 	
@@ -195,7 +129,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		dynamic:  function($content) {
 			$content.find(".subtitle").addClass("b_");
 			$content.find("table p").css("padding", "3px 5px");
-			clipVNExpress($content);
+			Util_.clipVNExpress($content);
 		}
 	},
 	
@@ -213,7 +147,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: "table, .item_slide_show",
 		remove: "",
 		hide: "",
-		dynamic: clipVNExpress
+		dynamic: Util_.clipVNExpress
 	},
 	
 	{
@@ -259,7 +193,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	
 	{
 		domain: "vietnamnet.vn",
-		info: "Có thể ko xem nhanh được ảnh và clip trong bài",
+		referrer: "no-referrer",
 		title: ".ArticleDetail h1.title",
 		author: "",
 		date: ".ArticleDetail .ArticleDateTime .ArticleDate",
@@ -269,8 +203,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		content: "#ArticleContent",
 		quote: "",
 		caption: ".image_desc",
-		media: ".fmsmedia, .ImageBox, >div>img",
-		remove: ".logo-small, .box-taitro, .inner-article", // >strong>div>a, >div>strong>a, >div>a",
+		media: ".fmsmedia, .ImageBox, >div>img, table",
+		remove: ".box-taitro, .inner-article, table:has(.box-event)",
 		hide: "",
 		dynamic: function($content) {
 			var $media = $content.find(".fmsmedia");
@@ -285,16 +219,15 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 				// remove the thumbnail if any
 				$clipDiv.find("img, a").remove();
 				// add video
-				insertClip(useIframe, clipSrc, $clipDiv);
+				Util_.insertClip(useIframe, clipSrc, $clipDiv);
 			});
 			
-			$content.find("img[src*='imgs.vietnamnet.vn']").each(function(){
+			$content.find("div:has(a)").each(function(){
 				var $t = $(this);
-				$t.attr("alt", "[PHOTO] \"Xem nhanh\" không tải được ảnh :(")
-					.attr("title", "Thử chọn đường dẫn ảnh ở dưới, rồi click chuột phải, chọn \"Đi đến...\"")
-					.after($("<p />").text($t.attr("src")).addClass("caption_").css({
-					"font-size": "0.7rem",
-				}));
+				if ($t.text() === $t.find("a").text()) {
+					// this div contains <a> only, it must be a "related news" section
+					$t.remove();
+				}
 			});
 		}
 	},
@@ -325,7 +258,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 				"width": "auto",
 				"height": "auto"
 			});
-			clip($content);
+			Util_.clip($content);
 		}
 	},
 	
@@ -343,7 +276,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: ".VCSortableInPreviewMode",
 		remove: ".link-content-footer",
 		hide: "",
-		dynamic: clip
+		dynamic: Util_.clip
 	},
 	
 	{
@@ -381,11 +314,12 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: ".VCSortableInPreviewMode",
 		remove: ".knc-relate-wrapper, .link-content-footer",
 		hide: "",
-		dynamic: clip
+		dynamic: Util_.clip
 	},
 	
 	{
 		domain: "video.infonet.vn",
+		referrer: "no-referrer",
 		keepScripts: true,
 		title: "#content .video_info h1",
 		author: "",
@@ -403,7 +337,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		dynamic: function($content, $html) {
 			var clipSrc = $html.find("#content .player_wrapper script").text().match(/s720:(.*.mp4)/g)[0].substr(7);
 			var useIframe = false;
-			return insertClip(useIframe, clipSrc, $("<div class='media_' />"));
+			return Util_.insertClip(useIframe, clipSrc, $("<div class='media_' />"));
 		}
 	},
 	
@@ -481,7 +415,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		hide: "",
 		dynamic: function($content, $html) {
 			$html.find("#ctl00_IDContent_ctl00_divContent .sapo a").remove();
-			clip($content)
+			Util_.clip($content)
 		}
 	},
 	
@@ -534,7 +468,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: ".VCSortableInPreviewMode",
 		remove: ".tinlienquanold, .tlqdetailtotal, .tlqdetail, .tlqrdetail",
 		hide: "",
-		dynamic: clip
+		dynamic: Util_.clip
 	},
 	
 	{
@@ -547,6 +481,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImg: ".main-article .article-avatar img",
 		leadImgCaption: ".main-article .article-avatar figcaption",
 		content: ".article-body",
+		p: ">div:not(:has(p))",
 		quote: "blockquote",
 		caption: ".fig, figcaption",
 		media: ".article-photo",
@@ -611,7 +546,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 				
 				var files = query["file"].split("***");
 				for (i = files.length-1; i >= 0; i--){
-					insertClip(false, files[i], $t);
+					Util_.insertClip(false, files[i], $t);
 				}
 				
 				$t.css("padding", "0.5rem");
@@ -633,7 +568,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		quote: "",
 		caption: "figcaption",
 		media: "table, figure",
-		remove: ".boxrelation, .boxembedtinlienquan",
+		remove: ".boxrelation, .boxembedtinlienquan, .adsbygoogle, #AdAsia",
 		hide: "",
 		dynamic: function($content){
 			$content.find("div").addClass("p_");
@@ -654,13 +589,13 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImg: "._30q-[style*='background']",
 		leadImgCaption: "",
 		content: "._4lmi ._39k5._5s6c",
+		p: ">div",
 		quote: "",
 		caption: "",
 		media: "figure",
 		remove: "",
 		hide: "",
 		dynamic: function($content, $html){
-			$content.find(">div").addClass("p_");
 			$content.find("._4yxo").css({
 				"font-weight": "bold",
 				"font-size": "1.1em"
@@ -683,20 +618,39 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 				for (i = 1; i < things.length && i <= ybLen; i++){
 					clipID = things[i].substring(0, things[i].indexOf('"'));
 					clipSrc = "https://www.youtube.com/embed/" + clipID;
-					insertClip(true, clipSrc, $youtube.eq(i-1).empty());
+					Util_.insertClip(true, clipSrc, $youtube.eq(i-1).empty());
 				}
 			}
 		}
+	},
+	
+	{
+		domain: "tumblr.cuongdc.co",
+		match: "tumblr.cuongdc.co/post",
+		title: "title",
+		author: "",
+		source: "",
+		date: "",
+		lead: "",
+		leadImg: "",
+		leadImgCaption: "",
+		content: "article",
+		p: "",
+		quote: "",
+		caption: "",
+		media: "",
+		remove: "meta, .notes, footer, >a, noscript, #disqus_thread, #fb-comments, .vietid_comments_content, fb\\:like",
+		hide: ""
 	}
 	];
 	
 
 	var get = function(url){
-		var i, domain;
+		var i, match;
 		for (i=0; i<sites.length; i++){
-			domain = sites[i].domain;
-			if (url.indexOf("." + domain + "/") >= 0 ||
-					url.indexOf("/" + domain + "/") >= 0){
+			match = sites[i].match || sites[i].domain;
+			if (url.indexOf("." + match + "/") >= 0 ||
+					url.indexOf("/" + match + "/") >= 0){
 						return sites[i];
 			}
 		}
@@ -707,167 +661,6 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	return {
 		all: sites,
 		get: get
-	}
-	
-})(jQuery);
-
-(function($){
-
-	var ensureProtocol = function(url, fullUrl) {
-		if (url.indexOf("http") === 0) return url;
-		
-		var protocol = "http://";
-		if (!!fullUrl && fullUrl.indexOf("https://") === 0) {
-			protocol =  "https://";
-		}
-		return protocol + url;
-	}
-	
-	var getBaseUri= function($html, site, fullUrl){
-		var baseUri = "";
-		var $base = $html.find("base");
-		if ($base.length > 0) {
-			baseUri = $base.attr("href");
-			if (!!baseUri) return baseUri;
-		}
-		
-		var protocol = "http://";
-		if (!!fullUrl && fullUrl.indexOf("https://" === 0)) {
-			protocol =  "https://";
-		}
-		return protocol + site.domain;
-	}
-	
-	var fixSrc = function($dom, site, url){
-		$dom.find("img[data-src]").each(function(){
-				if (!$(this).attr("src")) {
-					$(this).attr("src", $(this).attr("data-src"));
-				}
-			});
-		
-		var baseUri = getBaseUri($dom, site, url);
-		$dom.find("img[src]").each(function(){
-			var src = $(this).attr("src");
-			if (src.indexOf("http") !== 0) {
-					$(this).attr("src", baseUri + src)
-			}
-		});
-		
-		$dom.find("a[href]").each(function(){
-			var src = $(this).attr("href");
-			if (src.indexOf("/") === 0) {
-					$(this).attr("href", baseUri + src)
-			}
-		});
-	}
-	
-	var process = function(html, site, url){
-		var nodeList = $.parseHTML("<div>" + html + "</div>", null, !!site.keepScripts);
-		var $html = $(nodeList);
-		
-		fixSrc($html, site, url);
-		
-		var $title = $html.find(site.title).first();
-		if ($title.length === 0) return;
-		
-		var $date = null;
-		if (site.date){
-			$date = $html.find(site.date);
-		}
-		
-		var $lead = null;
-		if (site.lead){
-			$lead = $html.find(site.lead).first();
-		}
-		var $leadImg = null;
-		if (site.leadImg){
-			$leadImg = $html.find(site.leadImg).first();
-		}
-		var $leadImgCaption = null;
-		if (site.leadImgCaption){
-			$leadImgCaption = $html.find(site.leadImgCaption).first();
-		}
-		
-		var $content = $html.find(site.content).first();
-		
-		if (($content.length === 0) &&
-			($lead === null || $lead.length === 0) &&
-			($leadImg === null || $leadImg.length === 0)) {
-				return;
-			}
-			
-		!!site.remove && $content.find(site.remove).remove();
-		!!site.hide && $content.find(site.hide).hide();
-		!!site.quote && $content.find(site.quote).addClass("quote_");
-		!!site.caption && $content.find(site.caption).addClass("caption_");
-		!!site.media && $content.find(site.media).addClass("media_");
-		if (!!site.dynamic) {
-			var $newContent = site.dynamic($content, $html);
-			if (($content.length === 0) && !!$newContent && ($newContent.length > 0)) {
-				$content = $newContent;
-			}
-		}
-		
-		// Clean unwelcomed things
-		$html.find("style, script").remove();
-				
-		// append to preview pane
-		if (!!$date) {
-			if (!site.dateAttr){
-				$("#qvDate_").text($date.text());
-			} else {
-				var unparsedDate = $date.attr(site.dateAttr);
-				var parsedDate = Date.parse(unparsedDate);
-				var dateString = unparsedDate;
-				if (!isNaN(parsedDate)) {
-					dateString = (new Date(parsedDate)).toLocaleString();
-				}
-				$("#qvDate_").text(dateString);
-			}
-		}
-		$("#qvTitle_").text($title.text());
-		!!$lead && $("#qvLead_").append($lead);
-		!!$leadImg && $("#qvLeadImg_").append($leadImg);
-		!!$leadImgCaption && $("#qvLeadImgCaption_").text($leadImgCaption.text());
-		$("#qvContent_").append($content);
-		
-		// show the preview button
-		$("#qvLinkDiv_").show();
-	}
-	
-	var load = function(url, site){
-		$.get({
-			url: url,
-			dataType: "html"
-		}).fail(function(jqXHR, textStatus, errorThrown){
-			console.log(textStatus + " (" + jqXHR.status + "): " + errorThrown);
-			console.log(url);
-		}).done(function(html){
-			process(html, site, url);
-		});
-	}
-	
-	var url = $("#qvDiv_").attr("data-url");
-	var site = KnownSites_.get(url);
-	if (!site) return;
-	
-	// flattern javascript redirect (and meta refresh?)
-	if (url.indexOf("/cafebiz.vn/news-") >= 0) {
-		$.get({
-			url: url,
-			dataType: "html"
-		}).done(function(html){
-			if (html.indexOf("<body onload=\"window.location.href=") > 0) {
-				var start = html.indexOf("window.location.href=") + "window.location.href=".length + 1;
-				var end = html.indexOf("' + window.location.hash");
-				var newUrl = ensureProtocol(site.domain, url) + html.substring(start, end);
-				load(newUrl, site);
-			} else {
-				process(html, site, url);
-			}
-		});
-	} else {
-		load(url,site);
 	}
 	
 })(jQuery);
