@@ -4,11 +4,11 @@ window.Previewer_ = window.Previewer_ || (function($){
 
 	// should load from template files
 	var buildPreviewPane = function(){
-		var $ivLink = $("<div id='qvLinkDiv_' style='display:none;margin-top:1rem'><button id='qvLink_'  style='background:#C00607;color:#f8f8f8;border-radius:3px;border:0;padding:4px 8px;font-size:0.75rem;cursor:pointer'>&#9889; Xem nhanh &#9889;</button></div>");
-		$(".link-summary").append($ivLink);
+		var $qvLink = $("<div id='qvLinkDiv_' style='display:none;margin-top:1rem'><button id='qvLink_'  style='background:#C00607;color:#f8f8f8;border-radius:3px;border:0;padding:4px 8px;font-size:0.75rem;cursor:pointer'>&#9889; Xem nhanh &#9889;</button></div>");
+		$(".link-summary").append($qvLink);
 		
 		var $qv = $("<div id='qvDiv_' class='app-content'/>")
-	var $style = $("<style>#qvDate_:empty, #qvDiv_ {display:none;position:relative;margin-top:0.5rem;padding: 0 0.8rem 0 1rem;font-size:1rem;line-height:1.556;clear:both} #qvContent_ h1 {padding:1rem 0 0.5rem;line-height: 1.36;font-size:1.3rem} #qvContent_ h2, #qvContent_ h3 {padding:1rem 0 0.5rem;line-height: 1.4} #qvDiv_ ul {padding-left:1rem} #qvDiv_ p, #qvDiv_ .p_, #qvContent_>div {padding-top:0.65rem} #qvDiv_ .quote_{float:none;font-size:1.1rem;border-left:5px solid grey;padding:0.5rem;margin:1.5em 0 0;font-style: italic} #qvDiv_ .media_ {margin-top:1rem;} #qvDiv_ img,#qvDiv_ video {max-width:100%;width:auto;height:auto} #qvDiv_ .caption_ {font-size:0.9rem;font-style:italic;line-height:1.5;display:block;margin-top: 0.3rem;} #qvDiv_ .b_ {font-weight:bold} figure {margin:0} #qvLead_:empty,#qvLeadImg_:empty,#qvLeadImgCaption_:empty {display:none}</style>");
+		var $style = $("<style>#qvDate_:empty, #qvDiv_ {display:none;position:relative;margin-top:0.5rem;padding: 0 0.8rem 0 1rem;font-size:1rem;line-height:1.556;clear:both} #qvContent_ h1 {padding:1rem 0 0.5rem;line-height: 1.36;font-size:1.3rem} #qvContent_ h2, #qvContent_ h3 {padding:1rem 0 0.5rem;line-height: 1.4} #qvDiv_ ul {padding-left:1rem} #qvDiv_ p, #qvDiv_ .p_, #qvContent_>div {padding-top:0.65rem} #qvDiv_ .quote_{float:none;font-size:1.1rem;border-left:5px solid grey;padding:0.5rem;margin:1.5em 0 0;font-style: italic} #qvDiv_ .media_ {margin-top:1rem;} #qvDiv_ img,#qvDiv_ video {max-width:100%;width:auto;height:auto} #qvDiv_ .caption_ {font-size:0.9rem;font-style:italic;line-height:1.5;display:block;margin-top: 0.3rem;} #qvDiv_ .b_ {font-weight:bold} figure {margin:0} #qvLead_:empty,#qvLeadImg_:empty,#qvLeadImgCaption_:empty {display:none}</style>");
 		var $qvDate = $("<div id='qvDate_' style='font-size:0.75rem;color:gray;margin-top:0.8rem'/>");
 		var $qvTitle = $("<h1 id='qvTitle_' style='font-size:1.5rem;line-height:1.36;padding:.5rem 0'/>");
 		var $qvLead = $("<p id='qvLead_' style='font-weight:bold;padding-bottom: 0.2rem'/>");

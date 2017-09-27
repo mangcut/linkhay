@@ -68,6 +68,23 @@ window.Util_ = window.Util_ || (function($){
 			exports.insertClip(useIframe, clipSrc, $clipDiv);
 		});
 	}
+	
+	exports.waitForEl = function(selector, timeOut, callback, timeOutCallBack) {
+		if (timeOut < 0) {
+			!!timeOutCallBack && timeOutCallBack();
+			alert("timeOut");
+			return null;
+		}
+		
+		var el = document.querySelector(selector);
+		if (!!el) {
+			callback(el);
+		} else {
+			setTimeout(function() {
+				exports.waitForEl(selector, timeOut - 100, callback, timeOutCallBack);
+			}, 100);
+		}
+	};
 		
 	return exports;
 	

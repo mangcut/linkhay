@@ -50,47 +50,90 @@ window.Improver_ = window.Improver_ || (function($){
 		});
 	}
 	
-	// when submit link, fetch title and description and fill
-	// textboxes as default values
-	var fetchDataWhenSubmit = function(){
+	var handleLinkPasted = function(){
 		$(document).on('paste','#link-post-frm-url',function(e) {
 			var text = (e.originalEvent || e).clipboardData.getData('text/plain');
-			if (text.match(/https?\:\/\/([^\/\.:?#]+)\.([^\/\.:?#]+)/i)) {
-				$.get({url:text}).done(function(html){
-					if ($("#link-post-frm-cat").val() == -1) {
-						// channel default to News
-						$("#link-post-frm-cat").val(9);
-					}
-					
-					var nodeList = $.parseHTML("<div>" + html + "</div>");
-					var $html = $(nodeList);
-					var site = KnownSites_.get(text);
-					var title = null;
-					if (!!site) {
-						title = $html.find(site.title).text().trim();
-					}
-					if (!title) {
-						title = $html.find("meta[property='og:title']").attr('content').trim() || 
-										$html.find("title").text().trim();
-					}
-					
-					if (!!title) {
-						$("#link-post-frm-title").val(title);
-					}
-					
-					var desc = $html.find("meta[property='og:description']").attr('content') || 
-										$html.find("meta[name='description']").attr('content');
-					if (!desc && !!site && !!site.lead) {
-						desc = $html.find(site.lead).text();
-					}
-					
-					if (!!desc) {
-						$("#link-post-frm-desc").val(desc.replace(/[\s+\.]$/g, '').substr(0, 200)).focus();
-					}
-				});
-			}
-	});
+			fetchDataForLink(text);
+		});
 	}
+	
+	// when submit link, fetch title and description and fill
+	// textboxes as default values
+	var fetchDataForLink = function(text){
+		if (text.match(/https?\:\/\/([^\/\.:?#]+)\.([^\/\.:?#]+)/i)) {
+			$.get({url:text}).done(function(html){
+				if ($("#link-post-frm-cat").val() == -1) {
+					// channel default to News
+					$("#link-post-frm-cat").val(9);
+					$("#link-post-frm .cat-frm .selected-item>div").text("Thời sự");
+				}
+				
+				var nodeList = $.parseHTML("<div>" + html + "</div>");
+				var $html = $(nodeList);
+				var site = KnownSites_.get(text);
+				var title = null;
+				if (!!site) {
+					title = $html.find(site.title).text().trim();
+				}
+				if (!title) {
+					title = $html.find("meta[property='og:title']").attr('content').trim() || 
+									$html.find("title").text().trim();
+				}
+				
+				if (!!title) {
+					$("#link-post-frm-title").val(title);
+				}
+				
+				var desc = $html.find("meta[property='og:description']").attr('content') || 
+									$html.find("meta[name='description']").attr('content');
+				if (!desc && !!site && !!site.lead) {
+					desc = $html.find(site.lead).text();
+				}
+				
+				if (!!desc) {
+					$("#link-post-frm-desc").val(desc.replace(/[\s\.]+$/g, '').substr(0, 200)).focus();
+				}
+				
+				var thumb = null;
+				if (!!site && !!site.leadImg) {
+					thumb = $html.find(site.leadImg).attr("src");
+				}
+				if (!thumb) {
+					thumb = $html.find("meta[property='og:image']").attr('content');
+				}
+				
+				if (!!thumb) {
+					window.setTimeout(function(){
+						$("#link-post-frm-embed-wrap, #link-post-frm-thumb-wrap").toggle();
+						$("#link-post-frm-thumb").focus().val(thumb);
+						$("#link-post-frm-desc").focus();
+						window.setTimeout(function(){
+							$("#link-post-frm-embed-wrap, #link-post-frm-thumb-wrap").toggle();
+						}, 0);
+					}, 1000);
+				}
+			});
+		}
+	}
+	
+	/*
+	
+	// Auto-pasting require clipboard permission, which browser will ask user -> some may uninstall
+	// Plus, we need to check if clipboard data is in form of URL
+	// so must paste to a background input first, not paste directly like this
+	
+	// => remove this feature
+	
+	var onSubmitLink = function(){
+		$("#lh-header a[class='submit']").on("click", function(){
+			Util_.waitForEl("#link-post-frm-url", 3000, function(el){
+				$(el).focus();
+				document.execCommand('paste');
+				fetchDataForLink($(el).val());
+			});
+		});
+	}
+	*/
 	
 	var execute = function(url) {
 		
@@ -98,7 +141,8 @@ window.Improver_ = window.Improver_ || (function($){
 			showLinkDomain();
 		}
 		
-		fetchDataWhenSubmit();
+		//onSubmitLink();
+		handleLinkPasted();
 		
 		/*
 		
