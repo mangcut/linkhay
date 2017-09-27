@@ -84,7 +84,18 @@ window.Util_ = window.Util_ || (function($){
 				exports.waitForEl(selector, timeOut - 100, callback, timeOutCallBack);
 			}, 100);
 		}
-	};
+	}
+	
+	exports.query = function(url){
+		var query = {};
+		var a = (url.indexOf("?") >= 0 ? url.split("?", 2)[1] : url).split('&');
+		for (var i = 0; i < a.length; i++) {
+				var b = a[i].split('=');
+				query[decodeURIComponent(b[0]).toLowerCase()] = decodeURIComponent(b[1] || '');
+		}
+		
+		return query;
+	}
 		
 	return exports;
 	

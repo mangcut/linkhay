@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "LinkHay QuickView",
-	"version": "1.1.0.1",
+	"version": "1.1.1",
 	"description": "Cho phép xem nhanh trong LinkHay.com",
 	"icons": {"192": "icon.png"},
 	"permissions": [
@@ -18,8 +18,8 @@
 			"matches": ["*://*.linkhay.com/*"],
 			"js": [
 				"jquery-3.2.1.min.js",
-				"pageInfo.js",
 				"util.js",
+				"pageInfo.js",
 				"sites.js",
 				"preview.js",
 				"clean.js",

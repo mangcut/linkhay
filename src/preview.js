@@ -8,7 +8,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 		$(".link-summary").append($qvLink);
 		
 		var $qv = $("<div id='qvDiv_' class='app-content'/>")
-		var $style = $("<style>#qvDate_:empty, #qvDiv_ {display:none;position:relative;margin-top:0.5rem;padding: 0 0.8rem 0 1rem;font-size:1rem;line-height:1.556;clear:both} #qvContent_ h1 {padding:1rem 0 0.5rem;line-height: 1.36;font-size:1.3rem} #qvContent_ h2, #qvContent_ h3 {padding:1rem 0 0.5rem;line-height: 1.4} #qvDiv_ ul {padding-left:1rem} #qvDiv_ p, #qvDiv_ .p_, #qvContent_>div {padding-top:0.65rem} #qvDiv_ .quote_{float:none;font-size:1.1rem;border-left:5px solid grey;padding:0.5rem;margin:1.5em 0 0;font-style: italic} #qvDiv_ .media_ {margin-top:1rem;} #qvDiv_ img,#qvDiv_ video {max-width:100%;width:auto;height:auto} #qvDiv_ .caption_ {font-size:0.9rem;font-style:italic;line-height:1.5;display:block;margin-top: 0.3rem;} #qvDiv_ .b_ {font-weight:bold} figure {margin:0} #qvLead_:empty,#qvLeadImg_:empty,#qvLeadImgCaption_:empty {display:none}</style>");
+		var $style = $("<style>#qvDate_:empty, #qvDiv_ {display:none;position:relative;margin-top:0.5rem;padding: 0 0.8rem 0 1rem;font-size:1rem;line-height:1.556;clear:both} #qvContent_ h1 {padding:1rem 0 0.5rem;line-height: 1.36;font-size:1.3rem} #qvContent_ h2, #qvContent_ h3 {padding:1rem 0 0.5rem;line-height: 1.4} #qvContent_ a {text-decoration:underline} #qvDiv_ ul {padding-left:1rem} #qvDiv_ p, #qvDiv_ .p_, #qvContent_>div {padding-top:0.65rem} #qvDiv_ .quote_{float:none;font-size:1.1rem;border-left:5px solid grey;padding:0.5rem;margin:1.5em 0 0;font-style: italic} #qvDiv_ .media_ {margin-top:1rem;} #qvDiv_ img,#qvDiv_ video {max-width:100%;width:auto;height:auto} #qvDiv_ .caption_ {font-size:0.9rem;font-style:italic;line-height:1.5;display:block;margin-top: 0.3rem;} #qvDiv_ .b_ {font-weight:bold} figure {margin:0} #qvLead_:empty,#qvLeadImg_:empty,#qvLeadImgCaption_:empty {display:none}</style>");
 		var $qvDate = $("<div id='qvDate_' style='font-size:0.75rem;color:gray;margin-top:0.8rem'/>");
 		var $qvTitle = $("<h1 id='qvTitle_' style='font-size:1.5rem;line-height:1.36;padding:.5rem 0'/>");
 		var $qvLead = $("<p id='qvLead_' style='font-weight:bold;padding-bottom: 0.2rem'/>");
@@ -97,14 +97,16 @@ window.Previewer_ = window.Previewer_ || (function($){
 		$dom.find("img[src], iframe[src]").each(function(){
 			var src = $(this).attr("src");
 			if (src.indexOf("http") !== 0) {
-					$(this).attr("src", baseUri + src)
+				if (src.indexOf("/") !== 0) src = "/" + src;
+				$(this).attr("src", baseUri + src)
 			}
 		});
 		
 		$dom.find("a[href]").each(function(){
 			var src = $(this).attr("href");
-			if (src.indexOf("/") === 0) {
-					$(this).attr("href", baseUri + src)
+			if (src.indexOf("http") != 0) {
+				if (src.indexOf("/") !== 0) src = "/" + src;
+				$(this).attr("href", baseUri + src)
 			}
 		});
 	}
@@ -156,13 +158,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 		// Clean unwelcomed things
 		$.each([$content, $lead, $leadImg], function(index, $tag){
 			if (!!$tag) {
-				$tag.find("style, script").remove();
 				$tag.find("[style]").removeAttr("style");
-				$tag.find("p, div").each(function() {
-					var $this = $(this);
-					if($this.html().replace(/\s|&nbsp;/g, '').length == 0)
-						$this.remove();
-				});
 			}
 		});
 		
@@ -176,6 +172,19 @@ window.Previewer_ = window.Previewer_ || (function($){
 				$content = $newContent;
 			}
 		}
+		
+		// Clean unwelcomed things
+		$.each([$content, $lead, $leadImg], function(index, $tag){
+			if (!!$tag) {
+				$tag.find("style, script").remove();
+				$tag.find("p, div").each(function() {
+					var $this = $(this);
+					if($this.html().replace(/\s|&nbsp;/g, '').length === 0) {
+						$this.remove();
+					}
+				});
+			}
+		});
 		
 		// Make sure referrer is set for website which requires
 		if (!!site.referrer) {
@@ -206,7 +215,15 @@ window.Previewer_ = window.Previewer_ || (function($){
 		$("#qvContent_").append($content);
 		
 		// show the preview button
-		$("#qvLinkDiv_").show();
+		if (!!site.alwaysShow || $("#qvDiv_").height() <= 800 ) {
+			$("#qvLink_, #qvClose_").hide();
+			$("#qvLinkDiv_, #qvDiv_").show();
+		} else {
+			$("#qvLinkDiv_").show();
+			if (jQuery(window).scrollTop() + 50 < jQuery("#qvLink_").offset().top){
+				$("#qvLink_").trigger("click");
+			}
+		}
 	}
 	
 	var load = function(url, site){

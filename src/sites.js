@@ -497,7 +497,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		date: ".thread-cover .description .DateTime",
 		lead: ".main-article .article-sapo",
 		leadImg: ".thread-cover img.cover",
-		leadImgCaption: ".thread-cover .description",
+		leadImgCaption: "", //".thread-cover .description",
 		content: "#messageList .messageText",
 		quote: "",
 		caption: "figcaption",
@@ -535,13 +535,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 				$t.empty();
 				if (!config) return;
 				
-				var query = {};
-				var a = (config[0] === '?' ? config.substr(1) : config).split('&');
-				for (var i = 0; i < a.length; i++) {
-						var b = a[i].split('=');
-						query[decodeURIComponent(b[0]).toLowerCase()] = decodeURIComponent(b[1] || '');
-				}
-				
+				var query = Util_.query(config);
 				if (!query["file"]) return;
 				
 				var files = query["file"].split("***");

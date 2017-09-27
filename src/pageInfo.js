@@ -14,6 +14,9 @@ window.PageInfo_ = window.PageInfo_ || (function($){
 		info.targetUrl = $("#admrecommen").data("url").toLowerCase();
 	}
 	
+	info.query = 	Util_.query(window.location.href);
+	
+	console.log(info);
 	return info;
 	
 })(jQuery);
