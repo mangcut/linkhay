@@ -64,7 +64,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		content: "#abody",
 		quote: "",
 		p: ">div",
-		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
+		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, .caption, figcaption",
 		media: ".VCSortableInPreviewMode, table.imagefull",
 		remove: "article.story, .morenews",
 		hide: "",
@@ -573,7 +573,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	},
 	
 	{
-		domain: "www.facebook.com/notes",
+		domain: "www.facebook.com",
+		match: "www.facebook.com/notes",
 		keepScripts: true,
 		title: "._4lmi ._5s6c",
 		author: "._4lmi ._3uhg a._2yug",

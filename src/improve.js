@@ -1,13 +1,22 @@
 // look and feel improvements goes here
 window.Improver_ = window.Improver_ || (function($){
 
+	var addCustomStyle = function(){
+		var style = localStorage["qv_.customStyle"];
+		if (!!style){
+			var tag = document.createElement('style');
+			tag.textContent = style;
+			document.getElementsByTagName('head')[0].appendChild(tag);
+		}
+	}
+
 	/*
 	
 	NOT VERY USEFUL, SO COMMENT OUT
 
 	// function for converting some giphy
 	var giphy = function(){
-		$(".V2-comments .V2-comment-item .V2-comment-body a[title*='/media.giphy.com/media/']").not(".giphy_done_").each(function(){
+		$(".V2-comments .V2-comment-item .V2-comment-body a[title*='/media.giphy.com/media/']:not(.giphy_done_)").each(function(){
 			var $t = $(this).addClass("giphy_done_");
 			
 			$("<img />").attr("src", $t.attr("title")).on("load", function(){
@@ -34,8 +43,8 @@ window.Improver_ = window.Improver_ || (function($){
 	// show domain for links embeded in comments
 	// currently show as "https://goo.gl/iqBdHL" -> hard to spot spam
 	var showLinkDomain = function(){
-		$(".V2-comments .V2-comment-item .V2-comment-body a[href*='https://goo.gl/']").not(".goo_gl_done_").each(function(){
-			var $t = $(this).addClass("goo_gl_done_");
+		$(".V2-comments .V2-comment-item .V2-comment-body a[href*='https://goo.gl/']").each(function(){
+			var $t = $(this);
 			var targetUrl = $t.attr("title").split(/[?#]/)[0];
 			var matches = targetUrl.match(/^(?:https?\:\/\/)?([^\/:?#]+)(?::[^\/]+)?(?:\/(.+))?$/i);
 			if (matches) {
@@ -105,7 +114,7 @@ window.Improver_ = window.Improver_ || (function($){
 				var site = KnownSites_.get(text);
 				var title = null;
 				if (!!site) {
-					title = $html.find(site.title).text().trim();
+					title = $html.find(site.title).first().text().trim();
 				}
 				if (!title) {
 					title = $html.find("meta[property='og:title']").attr('content') || 
@@ -119,7 +128,7 @@ window.Improver_ = window.Improver_ || (function($){
 				var desc = $html.find("meta[property='og:description']").attr('content') || 
 									$html.find("meta[name='description']").attr('content');
 				if (!desc && !!site && !!site.lead) {
-					desc = $html.find(site.lead).text();
+					desc = $html.find(site.lead).first().text();
 				}
 				
 				if (!!desc) {
@@ -128,7 +137,16 @@ window.Improver_ = window.Improver_ || (function($){
 				
 				var thumb = null;
 				if (!!site && !!site.leadImg) {
-					thumb = $html.find(site.leadImg).attr("src");
+					var $thumb = $html.find(site.leadImg).first();
+					var thumbStyle = $thumb.attr("style");
+					if (!!thumbStyle) {
+						var matches = thumbStyle.match(/background\-image\s*:\s*url\s*\(\s*(.+)\s*\)/i);
+						if (!!matches) {
+							thumb = matches[1];
+						}
+					} else {
+						thumb = $thumb.attr("data-src") || $thumb.attr("src");
+					}
 				}
 				if (!thumb) {
 					thumb = $html.find("meta[property='og:image']").attr('content');
@@ -195,10 +213,43 @@ window.Improver_ = window.Improver_ || (function($){
 		});
 	}
 	
+	var addQVIndicator = function(){
+		var add = function(){
+			var domain = $(".V2-link-stream .V2-link-list .V2-link-item .link-info:not(.indicator_done_)").each(function(){
+				var $t = $(this);
+				// no way to find out the real URL, so use the domain to make fake URL
+				var fakeUrl = "/" + $t.find("a.source").text() + "/";
+				if (!!KnownSites_.get(fakeUrl)) {
+					var $c = $t.find("a.comments");
+					$("<span/>")
+						.text("⚡")
+						.attr("title", "Có bản xem nhanh")
+						.css({
+							"margin-left": "4px",
+							"display": "inline-block",
+							"font-weight": "bold" // for window 7
+						})
+						.appendTo($c);
+					$t.addClass("indicator_done_")
+				}
+			});
+		};
+
+		add();
+		$(".V2-link-stream .V2-link-list").on("click", ".load-more", function(){
+			window.setTimeout(function(){
+				add();
+			}, 1000);
+		});
+	}
+	
 	var execute = function(url) {
-		
-		if (PageInfo_.isExternalDetailedPage) {
+
+		if (!!PageInfo_.isExternalDetailedPage) {
+			addCustomStyle();
 			showLinkDomain();
+		} else if (!!PageInfo_.isStream) {
+			addQVIndicator();
 		}
 		
 		onSubmitLink();

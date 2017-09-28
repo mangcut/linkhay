@@ -5,9 +5,11 @@
     <title>LinkHay QuickView</title>
 		<style>
 			body {
-				min-width: 160px;
+				width: 320px;
 				background-color: antiquewhite;
 				padding-top: 1px;
+				padding-bottom: 8px;
+				margin: 16px;
 			}
 			h4 {
 			  margin-bottom: 0.5rem;
@@ -21,11 +23,17 @@
 				color: #f8f8f8;
 				cursor: pointer;
 			}
+			.url {
+				word-break: break-all;
+			}
 	</style>
   </head>
   <body>
-    <p><button id="sendLink" title="Gửi link đang mở ở tab hiện tại lên Linkhay">Gửi link</button></p>
-		<p><small><i>LinkHay QuickView - version 1.1<br>By <a target="_blank" href="http://linkhay.com/u/thinker">@thinker</a> at <a target="_blank" href="http://www.mangcut.vn/">Măng Cụt Labs</a></i></small></p>
+		<h4>Gửi tin này lên LinkHay?</h4>
+		<p class="url"><i id="url"></i></p>
+		<p><label><input id="stopAsking" type="checkbox" style="vertical-align: top;"> Không hỏi lại</label></p>
+		<p><button id="sendLink" title="Gửi link đang mở ở tab hiện tại lên Linkhay">GỬI</button></p>
+		<!--p><small><i>LinkHay QuickView - version 1.1<br>By <a target="_blank" href="http://linkhay.com/u/thinker">@thinker</a> at <a target="_blank" href="http://www.mangcut.vn/">Măng Cụt Labs</a></i></small></p-->
 		<script src="popup.js"></script>
   </body>
 </html>

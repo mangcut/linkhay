@@ -1,13 +1,28 @@
 (function(){
-	document.addEventListener('DOMContentLoaded', function () {
-		var btn = document.getElementById("sendLink");
-		btn.addEventListener('click', function() {
-			chrome.tabs.query({
+	//localStorage["qv_.stopAsking"] = false;
+	var stopAsking = (localStorage["qv_.stopAsking"] === "true");
+	var sendLink = function(url, index) {
+		chrome.tabs.create({
+			url: "http://linkhay.com/about.php?qvAutoSubmitLink=" + encodeURIComponent(url),
+			index: index
+		});
+		window.close();
+	}
+	
+	chrome.tabs.query({
 				active: true, currentWindow: true
 			}, function(tabs) {
-				window.open("http://linkhay.com/about.php?qvAutoSubmitLink=" + encodeURIComponent(tabs[0].url))
+					var url = tabs[0].url
+							index = tabs[0].index + 1;
+				if (stopAsking) {
+					sendLink(url, index);
+				} else {
+					document.getElementById("url").textContent = url;
+					document.getElementById("sendLink").addEventListener('click', function() {
+						localStorage["qv_.stopAsking"] = !!document.getElementById("stopAsking").checked;
+						sendLink(url, index);;
+					});
+				}
 			});
-		});
-	});
-		
+			
 })();
