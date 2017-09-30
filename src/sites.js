@@ -10,7 +10,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImg: "",
 		leadImgCaption: "",
 		content: ".detail-content .fck",
-		quote: ".quote",
+		quote: "[type='SimpleQuote']",
+		quoteCaption: "[type='SimpleQuote']>.StarNameCaption",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
 		remove: "div[type='RelatedOneNews'], div[type='RelatedNews']",
@@ -46,6 +47,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: ".totalcontentdetail .contentdetail",
 		quote: "",
+		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
 		remove: ".tindnd, .tinlienquan, .link-content-footer, .chisochungkhoan",
@@ -122,6 +124,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: ".sidebar_1 .content_detail",
 		quote: "",
+		infoBox: "table.tbl_insert",
 		caption: ".tplCaption .Image, .desc_cation",
 		media: "table, .item_slide_show",
 		remove: ".related_news",
@@ -372,8 +375,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: "#page-wraper .maincontent .content-detail",
 		quote: "",
-		caption: ".PCaption, figcaption",
-		media: "table.imageBox",
+		caption: ".caption, .PCaption, figcaption",
+		media: "table", //"table.imageBox, table:has(.caption)",
 		remove: ".knc-relate-wrapper, .link-content-footer",
 		hide: "",
 		dynamic: function($content, $html) {
@@ -414,7 +417,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		remove: ".news-tag",
 		hide: "",
 		dynamic: function($content, $html) {
-			$html.find("#ctl00_IDContent_ctl00_divContent .sapo a").remove();
+			$html.find("#ctl00_IDContent_ctl00_divContent .sapo a, #ctl00_IDContent_ctl00_divContent .sapo br").remove();
 			Util_.clip($content)
 		}
 	},
@@ -466,7 +469,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		quote: "",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
-		remove: ".tinlienquanold, .tlqdetailtotal, .tlqdetail, .tlqrdetail",
+		remove: ".tinlienquanold, .tlqdetailtotal, .tlqdetail, .tlqrdetail, .totaltlqbotcontent, .displaynone",
 		hide: "",
 		dynamic: Util_.clip
 	},
@@ -621,7 +624,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	
 	{
 		domain: "tumblr.cuongdc.co",
-		match: "tumblr.cuongdc.co/post",
+		//match: "tumblr.cuongdc.co/post",
 		title: "title",
 		author: "",
 		source: "",
@@ -634,8 +637,74 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		quote: "",
 		caption: "",
 		media: "",
-		remove: "meta, .notes, footer, >a, noscript, #disqus_thread, #fb-comments, .vietid_comments_content, fb\\:like",
+		remove: "meta, .notes, footer, noscript, #disqus_thread, #fb-comments, .vietid_comments_content, fb\\:like, .dsq-brlink, a[href='http://linkhay.com/submit']",
 		hide: ""
+	},
+	
+	{
+		domain: "baonghean.vn",
+		title: "#title",
+		author: "",
+		source: "",
+		pageCat: "#nav .curent",
+		date: "#date",
+		lead: "",
+		leadImg: "",
+		leadImgCaption: "",
+		content: "#content",
+		p: "",
+		quote: "",
+		caption: ".image_desc, figcaption",
+		media: "table.image, iframe",
+		remove: "table.rl",
+		hide: ""
+	},
+	
+	{
+		domain: "vnreview.vn",
+		title: ".asset-content .title-content h1",
+		author: "",
+		source: "",
+		siteCat: "Công nghệ",
+		pageCat: "",
+		date: ".asset-content .panel-social .review-displaydate",
+		lead: "",
+		leadImg: "",
+		leadImgCaption: "",
+		content: ".asset-content .journal-content-article",
+		p: "",
+		quote: "",
+		caption: "figcaption",
+		media: ".infogram-embed",
+		remove: "",
+		hide: "",
+		dynamic: function($content){
+			$content.find(">p:has(>a)")
+				.filter(function(){
+					var $t = $(this).clone();
+					$t.find("a").remove();
+					var t = $t.text().trim();
+					return (t === ">" || t === ">>" || t === "Đọc thêm");
+				})
+				.remove();
+			$content.find(".infogram-embed").each(function(){
+				var $t = $(this).empty();
+				var id = $t.attr("data-id");
+				var title = $t.attr("data-title");
+				
+				$("<p/>").text("[BIỂU ĐỒ] " + title).css("font-weight", "bold").appendTo($t);
+				//$("<a/>")
+				//	.attr("href", "https://e.infogram.com/" + id + "?src=embed")
+				//	.attr("target", "_blank")
+				//	.text("Click để xem biểu đồ")
+				//	.appendTo($t);
+					
+				$t.next("div").addClass("caption_").css({
+					"margin-bottom": "1rem"
+				}).find("a").first().text("Click để xem biểu đồ").next("a").remove();
+
+			});
+		}
 	}
 	];
 	

@@ -4,21 +4,27 @@ window.Previewer_ = window.Previewer_ || (function($){
 
 	// should load from template files
 	var buildPreviewPane = function(){
-		var $qvLink = $("<div id='qvLinkDiv_' style='display:none;margin-top:1rem'><button id='qvLink_'  style='background:#C00607;color:#f8f8f8;border-radius:3px;border:0;padding:4px 8px;font-size:0.75rem;cursor:pointer'>&#9889; Xem nhanh &#9889;</button></div>");
+		var $qvLink = $("<div id='qvLinkDiv_'><button id='qvLink_'><i class='fa fa-bolt' aria-hidden='true'></i> Xem nhanh</button></div>");
 		$(".link-summary").append($qvLink);
 		
 		var $qv = $("<div id='qvDiv_' class='app-content'/>")
-		var $style = $("<style>#qvDate_:empty, #qvDiv_ {display:none;position:relative;margin-top:0.5rem;padding: 0 0.8rem 0 1rem;font-size:1rem;line-height:1.556;clear:both} #qvContent_ h1 {padding:1rem 0 0.5rem;line-height: 1.36;font-size:1.3rem} #qvContent_ h2, #qvContent_ h3 {padding:1rem 0 0.5rem;line-height: 1.4} #qvContent_ a {text-decoration:underline} #qvDiv_ ul {padding-left:1rem} #qvDiv_ p, #qvDiv_ .p_, #qvContent_>div {padding-top:0.65rem} #qvDiv_ .quote_{float:none;font-size:1.1rem;border-left:5px solid grey;padding:0.5rem;margin:1.5em 0 0;font-style: italic} #qvDiv_ .media_ {margin-top:1rem;} #qvDiv_ img,#qvDiv_ video {max-width:100%;width:auto;height:auto} #qvDiv_ .caption_ {font-size:0.9rem;font-style:italic;line-height:1.5;display:block;margin-top: 0.3rem;} #qvDiv_ .b_ {font-weight:bold} figure {margin:0} #qvLead_:empty,#qvLeadImg_:empty,#qvLeadImgCaption_:empty {display:none}</style>");
-		var $qvDate = $("<div id='qvDate_' style='font-size:0.75rem;color:gray;margin-top:0.8rem'/>");
-		var $qvTitle = $("<h1 id='qvTitle_' style='font-size:1.5rem;line-height:1.36;padding:.5rem 0'/>");
-		var $qvLead = $("<p id='qvLead_' style='font-weight:bold;padding-bottom: 0.2rem'/>");
+		var $qvTopBar = $("<div id='qvTopBar_'><span id='qvDate_' /><span id='qvOldNews_'>ĐÀO MỘ</span></div>");
+		var $qvTitle = $("<h1 id='qvTitle_' />");
+		var $qvLead = $("<div id='qvLead_' />");
 		var $qvLeadImg = $("<div id='qvLeadImg_' class='media_' />");
-		var $qvLeadImgCaption = $("<p id='qvLeadImgCaption_' class='caption_' style='margin-bottom:1rem'/>");
-		var $qvContent = $("<div id='qvContent_' style='padding-bottom: 2rem;'/>");
-		var $qvBottomBar = $("<div id='qvBottomBar_' style='font-size:0.75rem;background:antiquewhite;padding:2px 8px;margin:0 -0.8rem -1px -1rem;'><a href='https://chrome.google.com/webstore/detail/linkhay-quickview/jdiingledcmkbdenjnfelcoomapkcbpm/support' target='_blank'>Phản hồi về Xem nhanh</a><a href='#' id='qvClose_' style='float:right'>[&times;] ĐÓNG</a><div>");
-		var $qvOverlay = $("<div id='qvOverlay_' style='display:none;position:absolute;left:0;bottom:0;right:0;background:linear-gradient(to bottom, transparent, #f4f5f7);padding:2rem 0 1rem;text-align:center'><button id='qvMore_'  style='background:#C00607;color:#f8f8f8;border-radius:3px;border:0;padding:4px 8px;font-size:0.75rem;cursor:pointer;box-shadow:0 8px 6px -6px gray'>ĐỌC TIẾP</button></div>");
+		var $qvLeadImgCaption = $("<p id='qvLeadImgCaption_' class='caption_'/>");
+		var $qvContent = $("<div id='qvContent_' />");
+		var $qvBottomBar = $("<div id='qvBottomBar_'><a href='https://chrome.google.com/webstore/detail/linkhay-quickview/jdiingledcmkbdenjnfelcoomapkcbpm/support' target='_blank'>Phản hồi về Xem nhanh</a><a href='#' id='qvClose_'>[&times;] ĐÓNG</a><div>");
+		var $qvOverlay = $("<div id='qvOverlay_'><button id='qvMore_'>ĐỌC TIẾP</button></div>");
 		
-		$qv.append($style).append($qvDate).append($qvTitle).append($qvLead).append($qvLeadImg).append($qvLeadImgCaption).append($qvContent).append($qvBottomBar).append($qvOverlay);
+		$qv.append($qvTopBar)
+			.append($qvTitle)
+			.append($qvLead)
+			.append($qvLeadImg)
+			.append($qvLeadImgCaption)
+			.append($qvContent)
+			.append($qvBottomBar)
+			.append($qvOverlay);
 		$(".link-summary").append($qv);
 
 		// Quick View button
@@ -96,7 +102,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 		var baseUri = getBaseUri($dom, site, url);
 		$dom.find("img[src], iframe[src]").each(function(){
 			var src = $(this).attr("src");
-			if (src.indexOf("http") !== 0) {
+			if (src.indexOf("http") !== 0 && src.indexOf("//") !== 0) {
 				if (src.indexOf("/") !== 0) src = "/" + src;
 				$(this).attr("src", baseUri + src)
 			}
@@ -104,7 +110,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 		
 		$dom.find("a[href]").each(function(){
 			var src = $(this).attr("href");
-			if (src.indexOf("http") != 0) {
+			if (src.indexOf("http") != 0 && src.indexOf("//") !== 0) {
 				if (src.indexOf("/") !== 0) src = "/" + src;
 				$(this).attr("href", baseUri + src)
 			}
@@ -150,11 +156,6 @@ window.Previewer_ = window.Previewer_ || (function($){
 				return;
 			}
 		
-		// remove, hide, empty
-		!!site.remove && $content.find(site.remove).remove();
-		!!site.hide && $content.find(site.hide).hide();
-		!!site.empty && $content.find(site.empty).empty();
-
 		// Clean unwelcomed things
 		$.each([$content, $lead, $leadImg], function(index, $tag){
 			if (!!$tag) {
@@ -164,8 +165,10 @@ window.Previewer_ = window.Previewer_ || (function($){
 		
 		!!site.p && $content.find(site.p).addClass("p_");
 		!!site.quote && $content.find(site.quote).addClass("quote_");
-		!!site.caption && $content.find(site.caption).addClass("caption_");
+		!!site.quoteCaption && $content.find(site.quoteCaption).addClass("quote-caption_");
+		!!site.infoBox && $content.find(site.infoBox).addClass("info-box_");
 		!!site.media && $content.find(site.media).addClass("media_");
+		!!site.caption && $content.find(site.caption).addClass("caption_");
 		if (!!site.dynamic) {
 			var $newContent = site.dynamic($content, $html);
 			if (($content.length === 0) && !!$newContent && ($newContent.length > 0)) {
@@ -173,13 +176,19 @@ window.Previewer_ = window.Previewer_ || (function($){
 			}
 		}
 		
+		// remove, hide, empty
+		!!site.remove && $content.find(site.remove).remove();
+		!!site.hide && $content.find(site.hide).hide();
+		!!site.empty && $content.find(site.empty).empty();
+		
 		// Clean unwelcomed things
 		$.each([$content, $lead, $leadImg], function(index, $tag){
 			if (!!$tag) {
 				$tag.find("style, script").remove();
-				$tag.find("p, div").each(function() {
+				$tag.find("p, div, h1, h2, h3, h4, h5, h6, a[name]").each(function() {
 					var $this = $(this);
-					if($this.html().replace(/\s|&nbsp;/g, '').length === 0) {
+					var html = $this.html().replace(/\s|&nbsp;/g, '').toLowerCase();
+					if(html.length === 0 || html === "<br>" || html === "<br/>") {
 						$this.remove();
 					}
 				});
@@ -195,24 +204,48 @@ window.Previewer_ = window.Previewer_ || (function($){
 		buildPreviewPane();
 		
 		// append to preview pane
+		var dateObj = null;
+		var dateText = null;
 		if (!!$date) {
 			if (!site.dateAttr){
-				$("#qvDate_").text($date.text());
+				dateText = $date.text();
+				$("#qvDate_").text(dateText);
 			} else {
-				var unparsedDate = $date.attr(site.dateAttr);
-				var parsedDate = Date.parse(unparsedDate);
-				var dateString = unparsedDate;
+				var dateText = $date.attr(site.dateAttr);
+				var parsedDate = Date.parse(dateText);
+				var dateString = dateText;
 				if (!isNaN(parsedDate)) {
-					dateString = (new Date(parsedDate)).toLocaleString();
+					dateObj = new Date(parsedDate);
+					dateString = dateObj.toLocaleString();
 				}
 				$("#qvDate_").text(dateString);
 			}
 		}
-		$("#qvTitle_").text($title.text().trim());
-		!!$lead && $("#qvLead_").append($lead);
-		!!$leadImg && $("#qvLeadImg_").append($leadImg);
+		
+		if (!dateObj && !!dateText) {
+			var dateMatches = dateText.match(/([0-3]\d?)(?:\/|-)(\d\d?)(?:\/|-)((?:19|20)\d\d)/);
+			if (!!dateMatches && dateMatches.length === 4){
+				dateObj = new Date(dateMatches[3],dateMatches[2]-1,dateMatches[1])
+			}
+		}
+		
+		if (!!dateObj){
+			var dateDiff = parseInt((new Date() - dateObj)/(24*3600*1000));
+			if (dateDiff >= 7) {
+				// old article warning
+				//.text(dateDiff + " ngày trước");
+				$("#qvOldNews_").show();
+			}
+		}
+		
+		var qvTitle = $title.text().trim();
+		if (qvTitle !== PageInfo_.title) {
+			$("#qvTitle_").text(qvTitle);
+		}
+		!!$lead && $("#qvLead_").append($lead.attr("id", "qvLeadInner_"));
+		!!$leadImg && $("#qvLeadImg_").append($leadImg.attr("id", "qvLeadImgInner_"));
 		!!$leadImgCaption && $("#qvLeadImgCaption_").text($leadImgCaption.text().trim());
-		$("#qvContent_").append($content);
+		$("#qvContent_").append($content.attr("id", "qvContentInner_"));
 		
 		// show the preview button
 		if (!!site.alwaysShow || $("#qvDiv_").height() <= 800 ) {

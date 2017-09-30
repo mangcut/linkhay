@@ -72,7 +72,6 @@ window.Util_ = window.Util_ || (function($){
 	exports.waitForEl = function(selector, timeOut, callback, timeOutCallBack) {
 		if (timeOut < 0) {
 			!!timeOutCallBack && timeOutCallBack();
-			alert("timeOut");
 			return null;
 		}
 		

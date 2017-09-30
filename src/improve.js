@@ -67,9 +67,30 @@ window.Improver_ = window.Improver_ || (function($){
 	var handleLinkPasted = function(){
 		$(document).on('paste','#link-post-frm-url',function(e) {
 			var text = (e.originalEvent || e).clipboardData.getData('text/plain');
-			window.setTimeout(function(){
-						fetchDataForLink(text);
-					}, 100);
+			if (text.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/gi)) {
+				window.setTimeout(function(){
+							fetchDataForLink(text);
+						}, 100);
+			}
+		});
+	}
+	
+	var invokeLoadImage = function(url, el){
+		if (url.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/gi)) {
+			$(el || "#mediaV2_post_frm .url-uploader")[0].click();
+			Util_.waitForEl(".LHV2-simple-frm .input-wrap input", 3000, function(input){
+				$(input).val(url);
+				$(".LHV2-simple-frm .action-bar .blue-btn")[0].click();
+			});
+		}
+	}
+	
+	var handleImagePasted = function(){
+		$(document).on('paste','#mediaV2_post_frm',function(e) {
+			console.log($(this).html());
+			//e.stopPropagation();
+			var url = (e.originalEvent || e).clipboardData.getData('text/plain');
+			invokeLoadImage(url);
 		});
 	}
 	
@@ -85,7 +106,7 @@ window.Improver_ = window.Improver_ || (function($){
 			
 			$.get({url:text}).done(function(html){
 				if ($("#link-post-frm-cat").val() == -1) {
-					if (text.indexOf("genk.vn") >= 0) {
+					if (text.indexOf("genk.vn") >= 0 || text.indexOf("vnreview.vn") >= 0) {
 						// channel default to Tech
 						$("#link-post-frm-cat").val(12);
 						$("#link-post-frm .cat-frm .selected-item>div").text("Công nghệ");
@@ -113,26 +134,48 @@ window.Improver_ = window.Improver_ || (function($){
 				var $html = $(nodeList);
 				var site = KnownSites_.get(text);
 				var title = null;
+				var siteWork = false;
 				if (!!site) {
 					title = $html.find(site.title).first().text().trim();
+					siteWork = !!title;
 				}
 				if (!title) {
-					title = $html.find("meta[property='og:title']").attr('content') || 
-									$html.find("title").text();
+					title = ($html.find("meta[property='og:title']").attr('content') || 
+									$html.find("title").text()).trim();
+				}
+				
+				if (!siteWork){
+					var titleCandidate = $html.find("h1:not(:has(a))").first().text().trim();
+					if (!!titleCandidate &&
+							titleCandidate.length >= 5 &&
+							(!title || (title.indexOf(titleCandidate) >= 0))) {
+						title = titleCandidate;
+					} else {
+						!!title && (title = title.split("/[|-]/", 2)[0]);
+					}
 				}
 				
 				if (!!title) {
 					$("#link-post-frm-title").val(title);
 				}
 				
-				var desc = $html.find("meta[property='og:description']").attr('content') || 
-									$html.find("meta[name='description']").attr('content');
+				var desc = ($html.find("meta[property='og:description']").attr('content') || 
+									$html.find("meta[name='description']").attr('content')).trim();
 				if (!desc && !!site && !!site.lead) {
 					desc = $html.find(site.lead).first().text();
 				}
 				
 				if (!!desc) {
-					$("#link-post-frm-desc").val(desc.replace(/[\s\.]+$/g, '').substr(0, 200)).focus();
+					desc = desc.split(/[|\-.?!]/, 2)[0].trim();
+					var remainCount = Math.min(90, 199 - (title?title.length:0));
+					while (desc.length > remainCount) {
+						var descParts = desc.split(", ");
+						descParts.pop();
+						desc = descParts.join(", ").trim();
+					}
+					if (desc.length > 0) {
+						$("#link-post-frm-desc").val(desc).focus(); //.replace(/[\s\.]+$/g, '')
+					}
 				}
 				
 				var thumb = null;
@@ -213,6 +256,39 @@ window.Improver_ = window.Improver_ || (function($){
 		});
 	}
 	
+	var onSubmitImage = function(){
+		$("#lh-header a.submit.media").on("click", function(){
+			Util_.waitForEl("#mediaV2_post_frm .url-uploader", 3000, function(el){
+				if (PageInfo_.query["qvautosubmitimage"]) {
+					var url = PageInfo_.query["qvautosubmitimage"];
+					var title = PageInfo_.query["qvautosubmitimagepagetitle"];
+					if (!!title) {
+						$("#mediaV2_post_title").text(title);
+						//$("#mediaV2_post_desc").focus();
+						//$("#mediaV2_post_content").attr("tabindex", -1).focus();
+						$("#mediaV2_poster_save_btn").focus();
+					}
+					invokeLoadImage(url, el);
+				}	
+			});
+		});
+	}
+	
+	var handleAddImage = function(){
+		chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+			if (msg.command === 'sendImgToLinkhay_add') {
+				// only add image if the "send media dialog is opening
+				if ($("#mediaV2_post_frm .url-uploader").length > 0) {
+					invokeLoadImage(msg.url);
+					sendResponse({ok: true});
+				} else {
+					// tell the background to open new tab
+					sendResponse({ok: false});
+				}
+			}
+		});
+	}
+	
 	var addQVIndicator = function(){
 		var add = function(){
 			var domain = $(".V2-link-stream .V2-link-list .V2-link-item .link-info:not(.indicator_done_)").each(function(){
@@ -222,12 +298,13 @@ window.Improver_ = window.Improver_ || (function($){
 				if (!!KnownSites_.get(fakeUrl)) {
 					var $c = $t.find("a.comments");
 					$("<span/>")
-						.text("⚡")
+						//.text("⚡")
+						.html("&#xf0e7;")
 						.attr("title", "Có bản xem nhanh")
 						.css({
 							"margin-left": "4px",
 							"display": "inline-block",
-							"font-weight": "bold" // for window 7
+							"font-family": "FontAwesome"
 						})
 						.appendTo($c);
 					$t.addClass("indicator_done_")
@@ -258,6 +335,15 @@ window.Improver_ = window.Improver_ || (function($){
 			var submitLink = $("#lh-header a.submit:contains('Gửi tin')")[0];
 			!!submitLink && submitLink.click();
 		}
+		
+		onSubmitImage();
+		handleImagePasted();
+		if (!!PageInfo_.query["qvautosubmitimage"]) {
+			var submitImg = $("#lh-header a.submit.media")[0];
+			!!submitImg && submitImg.click();
+		}
+		
+		handleAddImage();
 		
 		/*
 		

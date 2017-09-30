@@ -12,6 +12,7 @@ window.PageInfo_ = window.PageInfo_ || (function($){
 		// if a builtin preview available (like the one for Youtube link)
 		info.hadBuiltinPreview = ($(".link-summary .app-content").length > 0);
 		info.targetUrl = $("#admrecommen").data("url").toLowerCase();
+		info.title = $(".link-summary .title h1").text().trim();
 	} else {
 		info.isStream = ($(".V2-link-stream ul.V2-link-list").length > 0);
 	}
