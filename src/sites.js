@@ -181,15 +181,15 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	{
 		domain: "vneconomy.vn",
 		title: ".contentleft h1.h1titleheaderbvt",
-		author: ".leftmaincontentleft .tacgiabaiviet",
+		author: ".contentleft .tacgiabaiviet",
 		date: ".contentleft .timverbvvth",
 		lead: ".contentleft h2.h2titleheaderbvt",
 		leadImg: ".leftmaincontentleft .spimgbaiviet img",
 		leadImgCaption: ".leftmaincontentleft .spimgbaivietnote",
-		content: ".leftmaincontentleft .detailsbaiviet",
+		content: ".leftmaincontentleft .detailsbaiviet, .psamaincontenleft .psaboximage",
 		quote: "",
-		caption: "",
-		media: "",
+		caption: ".psaboxfooterimage, figcaption",
+		media: ".psaboximage",
 		remove: "",
 		hide: ""
 	},
@@ -197,6 +197,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	{
 		domain: "vietnamnet.vn",
 		referrer: "no-referrer",
+		replaceUrl: ["://m.", "://"],
 		title: ".ArticleDetail h1.title",
 		author: "",
 		date: ".ArticleDetail .ArticleDateTime .ArticleDate",
@@ -624,7 +625,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	
 	{
 		domain: "tumblr.cuongdc.co",
-		//match: "tumblr.cuongdc.co/post",
+		match: "tumblr.cuongdc.co/post",
 		title: "title",
 		author: "",
 		source: "",
@@ -722,9 +723,23 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		return null;
 	}
 	
+	var getByDomain = function(domain){
+		if (domain.indexOf("m.") === 0) {
+			domain = domain.substr(2);
+		} else if (domain.indexOf("touch.") === 0) {
+			domain = domain.substr(6);
+		}
+		for (var i=0; i<sites.length; i++){
+			if (sites[i].domain === domain) return sites[i];
+		}
+		
+		return null;
+	}
+	
 	return {
 		all: sites,
-		get: get
+		get: get,
+		getByDomain: getByDomain
 	}
 	
 })(jQuery);

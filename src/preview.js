@@ -8,7 +8,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 		$(".link-summary").append($qvLink);
 		
 		var $qv = $("<div id='qvDiv_' class='app-content'/>")
-		var $qvTopBar = $("<div id='qvTopBar_'><span id='qvDate_' /><span id='qvOldNews_'>ĐÀO MỘ</span></div>");
+		var $qvTopBar = $("<div id='qvTopBar_'><span id='qvDate_' /><span id='qvOldNews_' /></div>");
 		var $qvTitle = $("<h1 id='qvTitle_' />");
 		var $qvLead = $("<div id='qvLead_' />");
 		var $qvLeadImg = $("<div id='qvLeadImg_' class='media_' />");
@@ -147,14 +147,18 @@ window.Previewer_ = window.Previewer_ || (function($){
 			$leadImgCaption = $html.find(site.leadImgCaption).first();
 		}
 		
-		var $content = $html.find(site.content).first();
+		// content do not use .first() since we could not guarantee
+		// there's single mother tag for content
+		// if want .first to fetch first of several articles on same page
+		// use :first in selector
+		var $content = $html.find(site.content);//.first();
 		
 		if (($content.length === 0) &&
 			($lead === null || $lead.length === 0) &&
 			($leadImg === null || $leadImg.length === 0)) {
 				console.log("[QuickView] Article content not found: " + url);
 				return;
-			}
+		}
 		
 		// Clean unwelcomed things
 		$.each([$content, $lead, $leadImg], function(index, $tag){
@@ -181,7 +185,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 		!!site.hide && $content.find(site.hide).hide();
 		!!site.empty && $content.find(site.empty).empty();
 		
-		// Clean unwelcomed things
+		// Clean unwelcomed things + ajust some style
 		$.each([$content, $lead, $leadImg], function(index, $tag){
 			if (!!$tag) {
 				$tag.find("style, script").remove();
@@ -190,6 +194,16 @@ window.Previewer_ = window.Previewer_ || (function($){
 					var html = $this.html().replace(/\s|&nbsp;/g, '').toLowerCase();
 					if(html.length === 0 || html === "<br>" || html === "<br/>") {
 						$this.remove();
+					}
+				});
+				
+				$tag.find("iframe[width]").each(function(){
+					var ifWidth = $(this).attr("width");
+					if (ifWidth > 640){
+						$(this).css("width", "640px");
+					}
+					if (ifWidth > 624) {
+						$(this).css("margin-left", "-16px");
 					}
 				});
 			}
@@ -233,8 +247,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 			var dateDiff = parseInt((new Date() - dateObj)/(24*3600*1000));
 			if (dateDiff >= 7) {
 				// old article warning
-				//.text(dateDiff + " ngày trước");
-				$("#qvOldNews_").show();
+				$("#qvOldNews_").text(dateDiff + " ngày trước").show();
 			}
 		}
 		
@@ -245,7 +258,12 @@ window.Previewer_ = window.Previewer_ || (function($){
 		!!$lead && $("#qvLead_").append($lead.attr("id", "qvLeadInner_"));
 		!!$leadImg && $("#qvLeadImg_").append($leadImg.attr("id", "qvLeadImgInner_"));
 		!!$leadImgCaption && $("#qvLeadImgCaption_").text($leadImgCaption.text().trim());
-		$("#qvContent_").append($content.attr("id", "qvContentInner_"));
+		if ($content.length > 1) {
+			$("#qvContent_").append("<div id='qvContentInner_' />");
+			$("#qvContentInner_").append($content);
+		} else {
+			$("#qvContent_").append($content.attr("id", "qvContentInner_"));
+		}
 		
 		// show the preview button
 		if (!!site.alwaysShow || $("#qvDiv_").height() <= 800 ) {
@@ -277,6 +295,10 @@ window.Previewer_ = window.Previewer_ || (function($){
 		if (!site) {
 			console.log("[QuickView] Unsupported: " + url);
 			return;
+		}
+		
+		if (!!site.replaceUrl) {
+			url = url.replace(site.replaceUrl[0], site.replaceUrl[1]);
 		}
 		
 		// flattern javascript redirect (and meta refresh?)

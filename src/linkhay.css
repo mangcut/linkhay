@@ -107,7 +107,7 @@
 #qvDiv_ .caption_ p, #qvDiv_ .caption_ .p_, #qvContentInner_>div.caption_ {
 	padding-top:0.3rem
 }
-#qvDiv_ iframe[src*='youtube.com/'],iframe[src*='youtu.be/'] {
+#qvDiv_ iframe[src*='youtube.com/'],iframe[src*='youtu.be/'],iframe[src*='://embed.vietnamnettv.vn/'] {
 	margin-left:-1rem
 }
 #qvDiv_ .quote_ {
@@ -171,9 +171,15 @@
 	margin-top:1rem;
 	border: 0;
 }
+#qvContentInner_>iframe {
+	margin-top:1rem;	
+}
 #qvDiv_ table p {
 	padding: 2px 4px;
 }
 #qvTitle_:empty, #qvDate_:empty, #qvLead_:empty,#qvLeadImg_:empty,#qvLeadImgCaption_:empty {
 	display:none
+}
+.indicator_done_ .fa-bolt {
+	margin-left: 4px;
 }

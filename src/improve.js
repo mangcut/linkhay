@@ -43,7 +43,7 @@ window.Improver_ = window.Improver_ || (function($){
 	// show domain for links embeded in comments
 	// currently show as "https://goo.gl/iqBdHL" -> hard to spot spam
 	var showLinkDomain = function(){
-		$(".V2-comments .V2-comment-item .V2-comment-body a[href*='https://goo.gl/']").each(function(){
+		$(".V2-comments .V2-comment-item .V2-comment-body a[href*='//goo.gl/']").each(function(){
 			var $t = $(this);
 			var targetUrl = $t.attr("title").split(/[?#]/)[0];
 			var matches = targetUrl.match(/^(?:https?\:\/\/)?([^\/:?#]+)(?::[^\/]+)?(?:\/(.+))?$/i);
@@ -54,7 +54,11 @@ window.Improver_ = window.Improver_ || (function($){
 				}
 						
 				if (matches.length >= 3){
-					domain = domain + "/…" + matches[2].substr(-10);
+					if (matches[2].length <= 16) {
+						domain = domain + "/" + matches[2];
+					} else {
+						domain = domain + "/…" + matches[2].substr(-15);
+					}
 				}
 				
 				if (!!domain) {
@@ -291,21 +295,15 @@ window.Improver_ = window.Improver_ || (function($){
 	
 	var addQVIndicator = function(){
 		var add = function(){
-			var domain = $(".V2-link-stream .V2-link-list .V2-link-item .link-info:not(.indicator_done_)").each(function(){
+			$(".V2-link-stream .V2-link-list .V2-link-item .link-info:not(.indicator_done_)").each(function(){
 				var $t = $(this);
-				// no way to find out the real URL, so use the domain to make fake URL
-				var fakeUrl = "/" + $t.find("a.source").text() + "/";
-				if (!!KnownSites_.get(fakeUrl)) {
+				// no way to find out the real URL, so use the domain
+				var domain = $t.find("a.source").text();
+				if (!!KnownSites_.getByDomain(domain)) {
 					var $c = $t.find("a.comments");
-					$("<span/>")
-						//.text("⚡")
-						.html("&#xf0e7;")
+					$("<i />")
 						.attr("title", "Có bản xem nhanh")
-						.css({
-							"margin-left": "4px",
-							"display": "inline-block",
-							"font-family": "FontAwesome"
-						})
+						.addClass("fa fa-bolt")
 						.appendTo($c);
 					$t.addClass("indicator_done_")
 				}
