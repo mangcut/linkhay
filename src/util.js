@@ -4,10 +4,10 @@ window.Util_ = window.Util_ || (function($){
 	
 	exports.insertClip = function(useIframe, clipSrc, $target) {
 		if (!!useIframe) {
-			$("<iframe allowfullscreen frameborder='0' scrolling='no' style='width:640px;height:360px;margin-left:-1rem' />")
+			$("<iframe allowfullscreen frameborder='0' scrolling='no' style='width:640px;height:360px;margin-left:-16px' />")
 			.attr("src", clipSrc).prependTo($target);
 		} else {
-			$("<video controls />")
+			$("<video controls style='width:640px;height:360px' />") // set width/height to anti-splash
 				.append($("<source />")
 				.on("error", function(){
 					var $p = $("<p />").addClass("caption_");
@@ -94,6 +94,80 @@ window.Util_ = window.Util_ || (function($){
 		}
 		
 		return query;
+	}
+	
+	exports.showImageBox = function(src){
+		var $b = $("#image-box_");
+		if ($b.length === 0){
+			$b = $("<div />").attr("id", "image-box_").appendTo("body");
+		}
+		
+		$b.css("background-image", "none").on("click wheel", function(){
+				$(this).fadeOut("fast");
+				/*
+				$("body").css({
+					"overflow":"visible",
+					"height":"auto"
+				});
+				*/
+		}).fadeIn();
+		/*
+		$("body").css({
+			"overflow":"hidden",
+			"height":"100%"
+		});
+		*/
+		
+		$("<img />").on("load", function(){
+			var size = "auto";
+			if (this.naturalHeight > $b.height()) {
+				size = "contain";
+			}
+			$b.css({
+				"background-image": "url(" + src + ")",
+				"background-size": size
+			});
+		}).attr("src", src);
+	}
+	
+	exports.shouldExpand = function(){
+		// there's hash -> came from noti/reply/mention
+		// -> should not expand
+		if (!!window.location.hash && (window.location.hash != "#c0-form")) {
+			return false;
+		}
+		
+		var commentCount = $(".V2-comments .V2-comment-item").length;
+		
+		// no comment to read -> should expand
+		if (commentCount === 0){
+			return true;
+		}
+		
+		// I made comment here -> should not expand
+		if ($(".V2-comments .V2-comment-item .V2-comment-header a[href$='/" + PageInfo_.user + "']").length > 0){
+			return false;
+		}
+		
+		// Loadding too slow, I scrolled -> should not expand
+		if ($(window).scrollTop() + 50 >= $("#qvLink_").offset().top) {
+			return false;
+		}
+
+		// shown once -> should not expand
+		var list = localStorage["qv_.viewedList"] || "";
+		if (list.indexOf(PageInfo_.linkID) >= 0) {
+			return false;
+		}
+
+		// It is short -> let's expand
+		// Note: because images might not finish loading -> length is not very accurate
+		if ($("#qvDiv_").height() <= 640) {
+			return true;
+		}
+		
+		// It is long -> expand depend on number of comments
+		return (commentCount < 10);
 	}
 		
 	return exports;

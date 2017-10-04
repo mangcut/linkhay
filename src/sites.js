@@ -11,8 +11,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: ".detail-content .fck",
 		quote: "[type='SimpleQuote']",
-		quoteCaption: "[type='SimpleQuote']>.StarNameCaption",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
+		replaceDesc: "TTO - ",
 		media: ".VCSortableInPreviewMode",
 		remove: "div[type='RelatedOneNews'], div[type='RelatedNews']",
 		hide: "",
@@ -65,9 +65,10 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "#contentAvatar figure.caption",
 		content: "#abody",
 		quote: "",
+		infoBox: "table[bordercolor='#f3b204']",
 		p: ">div",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, .caption, figcaption",
-		media: ".VCSortableInPreviewMode, table.imagefull",
+		media: ".VCSortableInPreviewMode, table.imagefull, >div:has(>img, >.caption)",
 		remove: "article.story, .morenews",
 		hide: "",
 		dynamic: function($content) {
@@ -124,14 +125,12 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: ".sidebar_1 .content_detail",
 		quote: "",
-		infoBox: "table.tbl_insert",
+		infoBox: "table:not(:has(img, video, iframe))",
 		caption: ".tplCaption .Image, .desc_cation",
 		media: "table, .item_slide_show",
-		remove: ".related_news",
+		remove: ".related_news, .block_tinlienquan_temp, >p:has(strong a):contains('>> ')",
 		hide: "",
 		dynamic:  function($content) {
-			$content.find(".subtitle").addClass("b_");
-			$content.find("table p").css("padding", "3px 5px");
 			Util_.clipVNExpress($content);
 		}
 	},
@@ -163,19 +162,10 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: "#content_detail",
 		quote: ".quote-inner",
-		caption: ".expNoEdit .expEdit",
+		caption: ".expNoEdit .expEdit:not(.quote)",
 		media: ".expNoEdit",
 		remove: ".adbro-sm, .explus_related_1404022217, .single-tags, .adv, p:contains('>>>'), p:contains('Đọc thêm:')",
-		hide: "",
-		dynamic: function($content) {
-			$content.find(".quote_").css({
-				"float": "none",
-				"width": "auto",
-				"border-top": 0,
-				"padding": "0.5rem",
-				"margin": 0
-			});
-		}
+		hide: ""
 	},
 	
 	{
@@ -246,24 +236,12 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: ".klw-body-top .klw-new-content .knc-content",
 		quote: "",
-		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
+		infoBox: ".VCSortableInPreviewMode[type='content']",
+		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption, .LayoutAlbumCaption",
 		media: ".VCSortableInPreviewMode",
 		remove: ".knc-relate-wrapper",
 		hide: "",
-		dynamic: function($content) {
-			$content.find(".LayoutAlbumRow .LayoutAlbumItem").css({
-				"display": "inline-block",
-				"max-width": "50%",
-				"margin": 0,
-				"padding": "1px",
-				"box-sizing": "border-box"
-			});
-			$content.find(".LayoutAlbumRow .LayoutAlbumItem img").css({
-				"width": "auto",
-				"height": "auto"
-			});
-			Util_.clip($content);
-		}
+		dynamic: Util_.clip
 	},
 	
 	{
@@ -437,7 +415,12 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		caption: "figcaption",
 		media: ".body-image",
 		remove: "",
-		hide: ""
+		hide: "",
+		dynamic: function($content, $html) {
+			$html.find("video>source[data-src]:not([src])").each(function(){
+				$(this).attr("src", $(this).attr("data-src"));
+			});
+		}
 	},
 	
 	{
@@ -494,7 +477,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	},
 	
 	{
-		domain: "tinhte.vn",
+		domain: "tinhte.vn/threads",
 		title: ".thread-cover .title",
 		author: ".thread-cover .author .username",
 		source: "",
@@ -658,7 +641,26 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		caption: ".image_desc, figcaption",
 		media: "table.image, iframe",
 		remove: "table.rl",
-		hide: ""
+		hide: "",
+		dynamic: function($content){
+			$content.children().each(function(){
+				var $t = $(this),
+						matches = $t.text().match(/^\[gg_video](\d+)\[\/gg_video]$/);
+				if (!!matches){
+					$.getJSON("http://bna.vn/bna_craw/video.php", {
+						"mode": "get_link",
+						"id": matches[1]
+					}).done(function(data){
+						var url = data.data.links[data.data.links.length - 1].url;
+						Util_.insertClip(false, url, $t.empty());
+					}).fail(function(jqXHR, textStatus, errorThrown){
+						console.log(textStatus + " (" + jqXHR.status + "): " + errorThrown);
+						console.log(url);
+						$t.text("Không lấy được video clip.");
+					});
+				}
+			});
+		}
 	},
 	
 	{
@@ -685,6 +687,9 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 					var $t = $(this).clone();
 					$t.find("a").remove();
 					var t = $t.text().trim();
+					if (t.length === 0 && $(this).text().trim().indexOf(">") === 0) {
+						return true;
+					}
 					return (t === ">" || t === ">>" || t === "Đọc thêm");
 				})
 				.remove();
@@ -743,3 +748,148 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	}
 	
 })(jQuery);
+
+window.Cats_ = window.Cats_ || (function($){
+	
+	// map is array where each member:
+	// - is string -> match the category text
+	// - has test() - like RegExp? -> call test()
+	// - is an array? -> first element is url test, second category
+	
+	var cats = [
+	{
+		id: 9,
+		name: "Thời sự",
+		map: ["thời sự", "chính trị"]
+	},
+	
+	{
+		id: 7,
+		name: "Kinh doanh",
+		map: ["kinh doanh", "kinh tế", "doanh nghiệp"]
+	},
+	
+	{
+		id: 12,
+		name: "Công nghệ",
+		map: ["công nghệ", /^https?:\/\/genk\.vn\//, /^https?:\/\/vnreview\.vn\//,
+			/^https?:\/\/nhipsongso\.tuoitre\.vn\//]
+	},
+	
+	{
+		id: 18,
+		name: "Văn hóa",
+		map: ["văn hóa", "văn học", "nghệ thuật", "thơ", "du lịch",
+			/^https?:\/\/dulich\.tuoitre\.vn\//]
+	},
+	
+	{
+		id: 28,
+		name: "Khoa giáo",
+		map: ["khoa học", "giáo dục", "giáo dục - khuyến học"]
+	},
+	
+	{
+		id: 1,
+		name: "Giải trí",
+		map: ["giải trí", /^https?:\/\/kenh14\.vn\//, "âm nhạc", "thời trang", "điện ảnh", "xem - ăn -chơi"]
+	},
+	
+	{
+		id: 6,
+		name: "Thể thao",
+		map: ["thể thao"]
+	},
+	
+	{
+		id: 21,
+		name: "Gia đình & Sức khỏe ",
+		map: ["gia đình", "sức khỏe"]
+	},
+	
+	{
+		id: 19,
+		name: "Tệ nạn",
+		map: ["pháp luật"]
+	},
+	
+	{
+		id: 22,
+		name: "Lạ Funny",
+		map: []
+	},
+	
+	{
+		id: 691,
+		name: "Comic",
+		map: []
+	},
+	
+	{
+		id: 89,
+		name: "Nhiếp ảnh",
+		map: ["nhiếp ảnh"]
+	},
+	
+	{
+		id: 86,
+		name: "Sống đẹp",
+		map: ["sống đẹp"]
+	},
+	
+	{
+		id: 29,
+		name: "Môi trường",
+		map: ["môi trường"]
+	},
+	
+	{
+		id: 54,
+		name: "Anh em",
+		map: []
+	},
+	
+	{
+		id: 41,
+		name: "Quân sự",
+		map: ["quân sự"]
+	},
+	
+	{
+		id: 43,
+		name: "Sách",
+		map: ["sách"]
+	},
+	
+	{
+		id: 25,
+		name: "Âm nhạc",
+		map: ["âm nhạc"]
+	},
+	
+	{
+		id: 3,
+		name: "Tình yêu & Giới tính",
+		map: []
+	},
+	
+	{
+		id: 14,
+		name: "Giới trẻ",
+		map: ["giới trẻ"]
+	},
+	
+	{
+		id: 136,
+		name: "Đá Xoáy",
+		map: []
+	},
+	
+	{
+		id: 657,
+		name: "Xả Stress",
+		map: []
+	}
+		
+	]
+})(jQuery)();

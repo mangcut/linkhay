@@ -3,19 +3,34 @@ var TEST_PREVIEW_URL_ = null;
 window.Previewer_ = window.Previewer_ || (function($){
 
 	// should load from template files
-	var buildPreviewPane = function(){
+	var buildPreviewPane = function(site){
 		var $qvLink = $("<div id='qvLinkDiv_'><button id='qvLink_'><i class='fa fa-bolt' aria-hidden='true'></i> Xem nhanh</button></div>");
 		$(".link-summary").append($qvLink);
 		
-		var $qv = $("<div id='qvDiv_' class='app-content'/>")
+		var $qv = $("<div id='qvDiv_' />")
+		var qvClass = site.domain.replace(/\./g, "-");
+		!!site.extraClass && (qvClass += " " + site.extraClass);
+		$qv.addClass(qvClass);
+		
+		
 		var $qvTopBar = $("<div id='qvTopBar_'><span id='qvDate_' /><span id='qvOldNews_' /></div>");
 		var $qvTitle = $("<h1 id='qvTitle_' />");
 		var $qvLead = $("<div id='qvLead_' />");
-		var $qvLeadImg = $("<div id='qvLeadImg_' class='media_' />");
+		var $qvLeadImg = $("<div id='qvLeadImg_' class='media_ media-img_' />");
 		var $qvLeadImgCaption = $("<p id='qvLeadImgCaption_' class='caption_'/>");
 		var $qvContent = $("<div id='qvContent_' />");
 		var $qvBottomBar = $("<div id='qvBottomBar_'><a href='https://chrome.google.com/webstore/detail/linkhay-quickview/jdiingledcmkbdenjnfelcoomapkcbpm/support' target='_blank'>Phản hồi về Xem nhanh</a><a href='#' id='qvClose_'>[&times;] ĐÓNG</a><div>");
 		var $qvOverlay = $("<div id='qvOverlay_'><button id='qvMore_'>ĐỌC TIẾP</button></div>");
+		var $qvTools = $("<div id='qvTools_' title='Đổi cỡ chữ'><i data-font-size='12' class='fa fa-font' aria-hidden='true' /><i data-font-size='14' class='fa fa-font' aria-hidden='true' /><i data-font-size='16' class='fa fa-font' aria-hidden='true' /></div>");
+		$qvTools.find("i").on("click", function(){
+			var fontSize = $(this).attr("data-font-size") + "px";
+			document.documentElement.style.fontSize = fontSize;
+			if (fontSize === "16px") {
+				localStorage.removeItem("qv_.customStyle");
+			} else {
+				localStorage["qv_.customStyle"] = "html{font-size:" + fontSize + "}"
+			}
+		});
 		
 		$qv.append($qvTopBar)
 			.append($qvTitle)
@@ -24,7 +39,8 @@ window.Previewer_ = window.Previewer_ || (function($){
 			.append($qvLeadImgCaption)
 			.append($qvContent)
 			.append($qvBottomBar)
-			.append($qvOverlay);
+			.append($qvOverlay)
+			.append($qvTools);
 		$(".link-summary").append($qv);
 
 		// Quick View button
@@ -40,6 +56,20 @@ window.Previewer_ = window.Previewer_ || (function($){
 				$("#qvOverlay_").show("slow");
 			}
 			$("#qvDiv_").slideToggle("fast");
+			if (!$(this).hasClass("clicked_")){
+				$(this).addClass("clicked_");
+				var list = localStorage["qv_.viewedList"];
+				if (!!list) {
+					list = list.split("|");
+				} else {
+					list = [];
+				}
+				if (list.indexOf(PageInfo_.linkID) < 0) {
+					list.unshift(PageInfo_.linkID);
+					if (list.length > 100) list.length = 100;
+					localStorage["qv_.viewedList"] = list.join("|");
+				}
+			}
 		});
 		
 		$("#qvClose_").click(function(event){
@@ -117,6 +147,21 @@ window.Previewer_ = window.Previewer_ || (function($){
 		});
 	}
 	
+	var showImageBox = function($img){
+		$img.on("click", function(e){
+				e.preventDefault();
+				var src = null;
+				var $lb = $(this).parent("a[rel='lightbox']");
+				if ($lb.length === 1){
+					src = $lb.attr("href");
+				}
+				if (!src){
+					 src = $(this).attr("data-original") || $(this).attr("src");
+				}
+				!!src && Util_.showImageBox(src);
+			});
+	}
+	
 	var process = function(html, site, url){
 		var nodeList = $.parseHTML("<div>" + html + "</div>", null, !!site.keepScripts);
 		var $html = $(nodeList);
@@ -141,6 +186,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 		var $leadImg = null;
 		if (site.leadImg){
 			$leadImg = $html.find(site.leadImg).first();
+			($leadImg.length > 0) && showImageBox($leadImg);
 		}
 		var $leadImgCaption = null;
 		if (site.leadImgCaption){
@@ -169,9 +215,23 @@ window.Previewer_ = window.Previewer_ || (function($){
 		
 		!!site.p && $content.find(site.p).addClass("p_");
 		!!site.quote && $content.find(site.quote).addClass("quote_");
-		!!site.quoteCaption && $content.find(site.quoteCaption).addClass("quote-caption_");
 		!!site.infoBox && $content.find(site.infoBox).addClass("info-box_");
-		!!site.media && $content.find(site.media).addClass("media_");
+		if (!!site.media) {
+			var $mediaList = $content.find(site.media).addClass("media_");
+			$mediaList.each(function(){
+				var $il = $(this).find("img");
+				if ($il.length === 1){
+					$(this).addClass("media-img_")
+				}
+				
+				var $vl = $(this).find("video");
+				if ($vl.length === 1){
+					$(this).addClass("media-video_")
+				}
+			});
+			
+			showImageBox($mediaList.find("img[src]"));
+		}
 		!!site.caption && $content.find(site.caption).addClass("caption_");
 		if (!!site.dynamic) {
 			var $newContent = site.dynamic($content, $html);
@@ -199,13 +259,18 @@ window.Previewer_ = window.Previewer_ || (function($){
 				
 				$tag.find("iframe[width]").each(function(){
 					var ifWidth = $(this).attr("width");
-					if (ifWidth > 640){
-						$(this).css("width", "640px");
+					if (ifWidth === "100%" || ifWidth > 640){
+						$(this).css({
+							"width": "640px",
+							"height": "360px",
+						});
 					}
-					if (ifWidth > 624) {
+					if (ifWidth === "100%" || ifWidth > 624) {
 						$(this).css("margin-left", "-16px");
 					}
 				});
+				
+				$tag.find("video:not([controls])").attr("controls", "");
 			}
 		});
 		
@@ -215,7 +280,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 		}
 		
 		// build preview pane
-		buildPreviewPane();
+		buildPreviewPane(site);
 		
 		// append to preview pane
 		var dateObj = null;
@@ -266,14 +331,9 @@ window.Previewer_ = window.Previewer_ || (function($){
 		}
 		
 		// show the preview button
-		if (!!site.alwaysShow || $("#qvDiv_").height() <= 800 ) {
-			$("#qvLink_, #qvClose_").hide();
-			$("#qvLinkDiv_, #qvDiv_").show();
-		} else {
-			$("#qvLinkDiv_").show();
-			if (jQuery(window).scrollTop() + 50 < jQuery("#qvLink_").offset().top){
-				$("#qvLink_").trigger("click");
-			}
+		$("#qvLinkDiv_").show();
+		if (Util_.shouldExpand()){
+			$("#qvLink_").trigger("click");
 		}
 	}
 	
