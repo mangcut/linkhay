@@ -170,6 +170,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	
 	{
 		domain: "vneconomy.vn",
+		category: ".titleheaderbv span[itemprop='name']",
 		title: ".contentleft h1.h1titleheaderbvt",
 		author: ".contentleft .tacgiabaiviet",
 		date: ".contentleft .timverbvvth",
@@ -630,7 +631,6 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		title: "#title",
 		author: "",
 		source: "",
-		pageCat: "#nav .curent",
 		date: "#date",
 		lead: "",
 		leadImg: "",
@@ -668,8 +668,6 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		title: ".asset-content .title-content h1",
 		author: "",
 		source: "",
-		siteCat: "Công nghệ",
-		pageCat: "",
 		date: ".asset-content .panel-social .review-displaydate",
 		lead: "",
 		leadImg: "",
@@ -756,61 +754,107 @@ window.Cats_ = window.Cats_ || (function($){
 	// - has test() - like RegExp? -> call test()
 	// - is an array? -> first element is url test, second category
 	
+	// genk.vn: site
+	// vnreview.vn: site
+	// kenh14.vn: site
+	// nhipsongso.tuoitre.vn: site`
+	// dulich.tuoitre.vn: site
+	// cafebiz.vn: cat
+	// cafef.vn: cat
+	// tuoitre.vn: cat
+	
 	var cats = [
+	// private channels goes first
+	// private not currently supported
+	
+	// PUBLIC channels
 	{
 		id: 9,
 		name: "Thời sự",
-		map: ["thời sự", "chính trị"]
+		map: ["thời sự", "chính trị", "quân sự", "quốc phòng"]
 	},
 	
 	{
 		id: 7,
 		name: "Kinh doanh",
-		map: ["kinh doanh", "kinh tế", "doanh nghiệp"]
+		map: ["kinh doanh", "doanh nghiệp", "doanh nhân", "thị trường", "thị trường chứng khoán",
+			"tài chính", "chứng khoán", "địa ốc", "bất động sản", "ngân hàng", "kinh tế",
+			"tài chính - ngân hàng", "kinh tế vĩ mô", "đầu tư", "kinh tế vĩ mô - đầu tư",
+			/^https?:\/\/startup\.vnexpress\.net\//,
+			/^https?:\/\/kinhdoanh\.vnexpress\.net\//
+		]
 	},
 	
 	{
 		id: 12,
 		name: "Công nghệ",
-		map: ["công nghệ", /^https?:\/\/genk\.vn\//, /^https?:\/\/vnreview\.vn\//,
-			/^https?:\/\/nhipsongso\.tuoitre\.vn\//]
+		map: ["công nghệ", 
+					/^https?:\/\/genk\.vn\//,
+					/^https?:\/\/vnreview\.vn\//,
+					/^https?:\/\/nhipsongso\.tuoitre\.vn\//,
+					/^https?:\/\/sohoa\.vnexpress\.net\//,
+					"xe", "xe máy", "ô-tô", "xe độ", "siêu xe",
+					"điện thoại", "máy tính bảng", "ứng dụng di động",
+					"cuộc sống số", "viễn thông"
+		]
 	},
 	
 	{
 		id: 18,
 		name: "Văn hóa",
-		map: ["văn hóa", "văn học", "nghệ thuật", "thơ", "du lịch",
-			/^https?:\/\/dulich\.tuoitre\.vn\//]
+		map: [/^https?:\/\/dulich\.tuoitre\.vn\//,
+					"văn hóa", "văn học", "sách", "thơ", "nghệ thuật", "văn học - sách", "du lịch", "phượt",
+					/^https?:\/\/dulich\.vnexpress\.net\//,
+					"xuất bản", "sách hay"
+		]
 	},
 	
 	{
 		id: 28,
 		name: "Khoa giáo",
-		map: ["khoa học", "giáo dục", "giáo dục - khuyến học"]
+		map: [
+			"giáo dục", "học đường", "du học", "câu chuyện giáo dục", "góc học tập", // tuoitre.vn
+			"khoa học", "thường thức", "phát minh" // tuoitre.vn
+		]
 	},
 	
 	{
 		id: 1,
 		name: "Giải trí",
-		map: ["giải trí", /^https?:\/\/kenh14\.vn\//, "âm nhạc", "thời trang", "điện ảnh", "xem - ăn -chơi"]
+		map: [/^https?:\/\/kenh14\.vn\//,
+			"giải trí", "âm nhạc", "điện ảnh", "tv show", "thời trang", "hậu trường",
+			/^https?:\/\/giaitri\.vnexpress\.net\//,
+			"sao việt", "sao châu á", "sao hollywood",
+			"nhạc việt", "nhạc hàn", "nhạc âu mỹ",
+			"phim ảnh", "phim chiếu rạp", "phim truyền hình", "game show",
+			"thời trang sao", "mặc đẹp", "làm đẹp"
+		]
 	},
 	
 	{
 		id: 6,
 		name: "Thể thao",
-		map: ["thể thao"]
+		map: [
+			"thể thao", "bóng đá", "bóng đá anh", "bóng rổ", "quần vợt", "tennis",
+			/^https?:\/\/thethao\.tuoitre\.vn\//,
+			/^https?:\/\/thethao\.vnexpress\.net\//
+		]
 	},
 	
 	{
 		id: 21,
 		name: "Gia đình & Sức khỏe ",
-		map: ["gia đình", "sức khỏe"]
+		map: [
+			"sức khỏe", "dinh dưỡng", "mẹ & bé", "giới tính", "phòng mạch", "biết để khỏe",
+			"gia đình", "gia đình - vnexpress", "tâm sự",
+			"khỏe đẹp", "mẹ và bé", "bệnh thường gặp"
+		]
 	},
 	
 	{
 		id: 19,
 		name: "Tệ nạn",
-		map: ["pháp luật"]
+		map: []
 	},
 	
 	{
@@ -824,72 +868,48 @@ window.Cats_ = window.Cats_ || (function($){
 		name: "Comic",
 		map: []
 	},
-	
-	{
-		id: 89,
-		name: "Nhiếp ảnh",
-		map: ["nhiếp ảnh"]
-	},
-	
-	{
-		id: 86,
-		name: "Sống đẹp",
-		map: ["sống đẹp"]
-	},
-	
-	{
-		id: 29,
-		name: "Môi trường",
-		map: ["môi trường"]
-	},
-	
-	{
-		id: 54,
-		name: "Anh em",
-		map: []
-	},
-	
-	{
-		id: 41,
-		name: "Quân sự",
-		map: ["quân sự"]
-	},
-	
-	{
-		id: 43,
-		name: "Sách",
-		map: ["sách"]
-	},
-	
-	{
-		id: 25,
-		name: "Âm nhạc",
-		map: ["âm nhạc"]
-	},
-	
-	{
-		id: 3,
-		name: "Tình yêu & Giới tính",
-		map: []
-	},
-	
-	{
-		id: 14,
-		name: "Giới trẻ",
-		map: ["giới trẻ"]
-	},
-	
-	{
-		id: 136,
-		name: "Đá Xoáy",
-		map: []
-	},
-	
-	{
-		id: 657,
-		name: "Xả Stress",
-		map: []
-	}
 		
 	]
-})(jQuery)();
+	
+	var match = function(url, $h, site){
+		var i, j;
+		
+		// match URL first
+		for (i = 0; i < cats.length; i++){
+			for (j = 0; j < cats[i].map.length; j++){
+				if (typeof cats[i].map[j].test === "function"){
+					if (cats[i].map[j].test(url)) return cats[i];
+				}
+			}
+		}
+		
+		// match category
+		site = site || KnownSites_.get(url);
+		var selector = (site ? (site.subcat || site.category) : null) ||
+			"meta[property='article:section'],meta[itemprop='articleSection'],meta[name='dc.subject']";
+		var category = null;
+		if (selector.indexOf("meta") === 0) {
+			category = $h.find(selector).first().attr("content");
+		} else {
+			category = $h.find(selector).first().text();
+		}
+		
+		if (!!category) {
+			category = category.trim().toLowerCase();
+			for (i = 0; i < cats.length; i++){
+				for (j = 0; j < cats[i].map.length; j++){
+					if (cats[i].map[j] === category){
+						return cats[i];
+					}
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	return {
+		match: match
+	}
+	
+})(jQuery);

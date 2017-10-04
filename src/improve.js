@@ -91,7 +91,6 @@ window.Improver_ = window.Improver_ || (function($){
 	
 	var handleImagePasted = function(){
 		$(document).on('paste','#mediaV2_post_frm',function(e) {
-			console.log($(this).html());
 			//e.stopPropagation();
 			var url = (e.originalEvent || e).clipboardData.getData('text/plain');
 			invokeLoadImage(url);
@@ -109,15 +108,15 @@ window.Improver_ = window.Improver_ || (function($){
 			}
 			
 			$.get({url:text}).done(function(html){
+				var site = KnownSites_.get(text);
+				var nodeList = $.parseHTML("<div>" + html + "</div>");
+				var $html = $(nodeList);
+				
 				if ($("#link-post-frm-cat").val() == -1) {
-					if (text.indexOf("genk.vn") >= 0 || text.indexOf("vnreview.vn") >= 0) {
-						// channel default to Tech
-						$("#link-post-frm-cat").val(12);
-						$("#link-post-frm .cat-frm .selected-item>div").text("Công nghệ");
-					} else {
-						// channel default to News
-						$("#link-post-frm-cat").val(9);
-						$("#link-post-frm .cat-frm .selected-item>div").text("Thời sự");
+					var category = Cats_.match(text, $html, site);
+					if (!!category){
+						$("#link-post-frm-cat").val(category.id);
+						$("#link-post-frm .cat-frm .selected-item>div").text(category.name);
 					}
 				}
 				
@@ -134,9 +133,6 @@ window.Improver_ = window.Improver_ || (function($){
 					});
 				}
 				
-				var nodeList = $.parseHTML("<div>" + html + "</div>");
-				var $html = $(nodeList);
-				var site = KnownSites_.get(text);
 				var title = null;
 				var siteWork = false;
 				if (!!site) {
@@ -163,6 +159,7 @@ window.Improver_ = window.Improver_ || (function($){
 					$("#link-post-frm-title").val(title);
 				}
 				
+				/*
 				var desc = ($html.find("meta[property='og:description']").attr('content') || 
 									$html.find("meta[name='description']").attr('content')).trim();
 				if (!desc && !!site && !!site.lead) {
@@ -186,6 +183,8 @@ window.Improver_ = window.Improver_ || (function($){
 						$("#link-post-frm-desc").val(desc).focus(); //.replace(/[\s\.]+$/g, '')
 					}
 				}
+				*/
+				$("#link-post-frm-desc").attr("placeholder", "Thông điệp phụ - không bắt buộc").focus();
 				
 				var thumb = null;
 				if (!!site && !!site.leadImg) {
