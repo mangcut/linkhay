@@ -144,10 +144,26 @@ window.Util_ = window.Util_ || (function($){
 			return true;
 		}
 		
+		// I voted the post here -> should not expand
+		if ($(".V2-link-voter-list a.user-link[href$='/" + PageInfo_.user + "']").length > 0){
+			return false;
+		}
+		
 		// I made comment here -> should not expand
 		if ($(".V2-comments .V2-comment-item .V2-comment-header a[href$='/" + PageInfo_.user + "']").length > 0){
 			return false;
 		}
+		
+		// I liked a comment, or there's comment with 6+ likes
+		$(".V2-comment-vote .counter[voters]").each(function(){
+			if (parseInt($(this).text()) >= 6) return false;
+			
+			// Jean_Reno<br />domain<br />Jen0504<br />thinker<br />bellatrix<br />và 5 người khác...
+			var voters = $(this).attr("voters").split("<br />");
+			if (voters.indexOf(PageInfo_.user) >= 0) {
+					return false;
+				}
+		});
 		
 		// Loadding too slow, I scrolled -> should not expand
 		if ($(window).scrollTop() + 50 >= $("#qvLink_").offset().top) {
@@ -167,7 +183,7 @@ window.Util_ = window.Util_ || (function($){
 		}
 		
 		// It is long -> expand depend on number of comments
-		return (commentCount < 10);
+		return (commentCount < 5);
 	}
 		
 	return exports;

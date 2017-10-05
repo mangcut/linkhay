@@ -791,6 +791,7 @@ window.Cats_ = window.Cats_ || (function($){
 		map: ["công nghệ", 
 					/^https?:\/\/genk\.vn\//,
 					/^https?:\/\/vnreview\.vn\//,
+					/^https?:\/\/tinhte\.vn\//,
 					/^https?:\/\/nhipsongso\.tuoitre\.vn\//,
 					/^https?:\/\/sohoa\.vnexpress\.net\//,
 					"xe", "xe máy", "ô-tô", "xe độ", "siêu xe",
