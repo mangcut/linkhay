@@ -148,10 +148,15 @@ window.Previewer_ = window.Previewer_ || (function($){
 	}
 	
 	var showImageBox = function($img){
+		if (!$img || $img.length === 0) return;
+		if ($img.length === 1 && $img[0].nodeName != "IMG") {
+				$img = $img.find("img");
+		}
+		
 		$img.on("click", function(e){
 				e.preventDefault();
 				var src = null;
-				var $lb = $(this).parent("a[rel='lightbox']");
+				var $lb = $(this).parent("a[rel='lightbox'], a.detail-img-lightbox");
 				if ($lb.length === 1){
 					src = $lb.attr("href");
 				}
@@ -186,7 +191,6 @@ window.Previewer_ = window.Previewer_ || (function($){
 		var $leadImg = null;
 		if (site.leadImg){
 			$leadImg = $html.find(site.leadImg).first();
-			($leadImg.length > 0) && showImageBox($leadImg);
 		}
 		var $leadImgCaption = null;
 		if (site.leadImgCaption){
@@ -229,8 +233,6 @@ window.Previewer_ = window.Previewer_ || (function($){
 					$(this).addClass("media-video_")
 				}
 			});
-			
-			showImageBox($mediaList.find("img[src]"));
 		}
 		!!site.caption && $content.find(site.caption).addClass("caption_");
 		if (!!site.dynamic) {
@@ -239,6 +241,9 @@ window.Previewer_ = window.Previewer_ || (function($){
 				$content = $newContent;
 			}
 		}
+
+		showImageBox($leadImg);
+		showImageBox($content.find(".media_ img[src]"));		
 		
 		// remove, hide, empty
 		!!site.remove && $content.find(site.remove).remove();
@@ -362,12 +367,13 @@ window.Previewer_ = window.Previewer_ || (function($){
 		}
 		
 		// flattern javascript redirect (and meta refresh?)
-		if (url.match(/^(https?:\/\/)?(cafef|cafebiz|kenh14).vn\/news-\d+.chn/)) {
+		if (url.match(/^(https?:\/\/)?(cafef|cafebiz|kenh14|dantri\.com)\.vn\/news-\d+(\.\w+)?/)) {
 			$.get({
 				url: url,
 				dataType: "html"
 			}).done(function(html){
-				var find = html.match(/\<body\s+onload\s*\=\s*"(?:window\.)?location\.href\s*\=\s*'(.+?)'/i);
+				//var find = html.match(/\<body\s+onload\s*\=\s*"(?:window\.)?location\.href\s*\=\s*'(.+?)'/i);
+				var find = html.match(/(?:window\.)?(?:top\.)?location(?:\.href)?\s*\=\s*'(.+?)'/i);
 				if (!!find) {
 					var newUrl = find[1];
 					if (newUrl.indexOf("http") !== 0) {

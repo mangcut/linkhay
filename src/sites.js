@@ -10,10 +10,11 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImg: "",
 		leadImgCaption: "",
 		content: ".detail-content .fck",
-		quote: "[type='SimpleQuote']",
-		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
+		quote: "[type='SimpleQuote'], .trichdan",
+		infoBox: ".VCSortableInPreviewMode[type='content']",
+		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, .caption, .quote_author, figcaption",
 		replaceDesc: "TTO - ",
-		media: ".VCSortableInPreviewMode",
+		media: ".VCSortableInPreviewMode, .desc_image",
 		remove: "div[type='RelatedOneNews'], div[type='RelatedNews']",
 		hide: "",
 		dynamic: Util_.clip
@@ -29,9 +30,10 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "#mainDetail>.avatar-desc",
 		content: "#mainDetail .detail-content",
 		quote: "",
+		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
-		remove: ".link-content-footer",
+		remove: ".link-content-footer, .relationnews",
 		hide: "",
 		dynamic: Util_.clip
 	},
@@ -65,8 +67,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "#contentAvatar figure.caption",
 		content: "#abody",
 		quote: "",
-		infoBox: "table[bordercolor='#f3b204']",
-		p: ">div",
+		infoBox: "table[bordercolor], .VCSortableInPreviewMode[type='content']",
+		p: ">div, table[bordercolor] td>div>div:not(:first)",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, .caption, figcaption",
 		media: ".VCSortableInPreviewMode, table.imagefull, >div:has(>img, >.caption)",
 		remove: "article.story, .morenews",
@@ -255,6 +257,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "main article header figure figcaption",
 		content: "main article .detail-body .news-content",
 		quote: "",
+		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
 		remove: ".link-content-footer",
@@ -293,6 +296,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: ".kbwcb-left .klw-new-content .knc-content",
 		quote: "",
+		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
 		remove: ".knc-relate-wrapper, .link-content-footer",
@@ -392,6 +396,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: "#divNewsContent",
 		quote: "",
+		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
 		remove: ".news-tag",
@@ -452,6 +457,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: "#divNewsContent",
 		quote: "",
+		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
 		remove: ".tinlienquanold, .tlqdetailtotal, .tlqdetail, .tlqrdetail, .totaltlqbotcontent, .displaynone",
@@ -574,7 +580,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		content: "._4lmi ._39k5._5s6c",
 		p: ">div",
 		quote: "",
-		caption: "",
+		caption: "figure img+div",
 		media: "figure",
 		remove: "",
 		hide: "",
@@ -680,7 +686,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		remove: "",
 		hide: "",
 		dynamic: function($content){
-			$content.find(">p:has(>a)")
+			$content.children().has(">a")
 				.filter(function(){
 					var $t = $(this).clone();
 					$t.find("a").remove();
@@ -733,7 +739,10 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 			domain = domain.substr(6);
 		}
 		for (var i=0; i<sites.length; i++){
-			if (sites[i].domain === domain) return sites[i];
+			if (domain === sites[i].domain ||
+					domain.endsWith("." + sites[i].domain)){
+				return sites[i];
+			}
 		}
 		
 		return null;
@@ -794,6 +803,7 @@ window.Cats_ = window.Cats_ || (function($){
 					/^https?:\/\/tinhte\.vn\//,
 					/^https?:\/\/nhipsongso\.tuoitre\.vn\//,
 					/^https?:\/\/sohoa\.vnexpress\.net\//,
+					/^https?:\/\/www\.techz\.net\//,
 					"xe", "xe máy", "ô-tô", "xe độ", "siêu xe",
 					"điện thoại", "máy tính bảng", "ứng dụng di động",
 					"cuộc sống số", "viễn thông"
