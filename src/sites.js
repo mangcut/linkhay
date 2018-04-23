@@ -89,8 +89,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "#contentAvatar figure span",
 		content: "#abody",
 		quote: "",
-		infoBox: "table[bordercolor]",
-		p: ">div, table[bordercolor] td>div>div:not(:first)",
+		infoBox: "table[bordercolor], .quote",
+		p: ">div, >div>div, table[bordercolor] td>div>div:not(:first)",
 		caption: ".imgcaption, figcaption",
 		media: "table.imagefull, >div:has(>img, >.caption)",
 		remove: ".details__morenews, .article-poll, article.story",
@@ -152,7 +152,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		infoBox: "table:not(:has(img, video, iframe))",
 		caption: ".tplCaption .Image, .desc_cation",
 		media: "table, .item_slide_show",
-		remove: ".related_news, .block_tinlienquan_temp, >p:has(strong a):contains('>> ')",
+		remove: ".related_news, .block_tinlienquan_temp, .box_img_video, >p:has(strong a):contains('>> ')",
 		hide: "",
 		dynamic:  function($content) {
 			Util_.clipVNExpress($content);
