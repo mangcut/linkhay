@@ -93,7 +93,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		p: ">div, table[bordercolor] td>div>div:not(:first)",
 		caption: ".imgcaption, figcaption",
 		media: "table.imagefull, >div:has(>img, >.caption)",
-		remove: ".details__morenews, .article-poll",
+		remove: ".details__morenews, .article-poll, article.story",
 		hide: "",
 		dynamic: function($content) {
 			Util_.doClip($content, ".player-effect", ".video-effect a", "video", ".video-effect", "img, a", false);
@@ -429,6 +429,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		}
 	},
 	
+	/*
 	{
 		domain: "baomoi.com",
 		title: ".main-article header h1",
@@ -439,6 +440,29 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImg: "",
 		leadImgCaption: "",
 		content: ".main-article .article-body .body",
+		quote: "",
+		caption: "figcaption",
+		media: ".body-image",
+		remove: "",
+		hide: "",
+		dynamic: function($content, $html) {
+			$html.find("video>source[data-src]:not([src])").each(function(){
+				$(this).attr("src", $(this).attr("data-src"));
+			});
+		}
+	},
+	*/
+
+	{
+		domain: "baomoi.com",
+		title: ".article h1.article__header",
+		author: "",
+		source: ".article .article__meta .source",
+		date: ".article .article__meta time",
+		lead: ".article .article__sapo",
+		leadImg: "",
+		leadImgCaption: "",
+		content: ".article .article__body",
 		quote: "",
 		caption: "figcaption",
 		media: ".body-image",

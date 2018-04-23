@@ -4,7 +4,7 @@ window.Cleaner_ = window.Cleaner_ || (function($){
 	var execute = function(url) {
 		// hide the trash (ads, fb, etc.)
 		//$(".top-adv, .V2-old-style-sidebar-box, .controls, .fb-box").remove();
-		$(".top-adv, .fb-box").remove();
+		$(".top-adv, .V2-link-detail-fb-box").remove();
 		$("#admzone449, #admzone963, #admzone3174").parent().parent().remove();
 		$(".ads-links-recommend").hide();
 		
