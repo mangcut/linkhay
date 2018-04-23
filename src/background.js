@@ -6,13 +6,46 @@
 			contexts: ["image"]
 		});
 	});
+
+	/**
+	 * Possible parameters for request:
+	 *  action: "xhttp" for a cross-origin HTTP request
+	 *  method: Default "GET"
+	 *  url   : required, but not validated
+	 *  data  : data to send in a POST request
+	 *
+	 * The callback function is called upon completion of the request */
+	chrome.runtime.onMessage.addListener(function (request, sender, callback) {
+		if (request.action == "xhttp") {
+			var xhttp = new XMLHttpRequest();
+			var method = request.options.method ? request.options.method.toUpperCase() : 'GET';
+
+			xhttp.onload = function() {
+				callback({
+					error: null,
+					text: xhttp.responseText
+				});
+			};
+			xhttp.onerror = function(e) {
+				callback({
+					error: e
+				})
+			};
+			xhttp.open(method, request.options.url, true);
+			if (method === 'POST') {
+				xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			}
+			xhttp.send(request.options.data);
+			return true; // prevents the callback from being called too early on return
+		}
+	});
 	
 	chrome.contextMenus.onClicked.addListener(function(info, tab){
 		
 		var newTab = function(imgUrl, pageUrl, pageTitle){
 			pageTitle = pageTitle.split(/[|-]/, 2)[0].trim();
 			chrome.windows.create({
-				url: "http://linkhay.com/about.php?qvAutoSubmitImage=" + encodeURIComponent(imgUrl) +
+				url: "https://linkhay.com/about.php?qvAutoSubmitImage=" + encodeURIComponent(imgUrl) +
 							"&qvAutoSubmitImagePageUrl" + encodeURIComponent(pageUrl) +
 							"&qvAutoSubmitImagePageTitle=" + encodeURIComponent(pageTitle),
 				//type: "popup",

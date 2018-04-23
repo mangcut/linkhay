@@ -2,6 +2,25 @@ window.Util_ = window.Util_ || (function($){
 	
 	var exports = {};
 	
+	exports.getPage = function(options, success, error){
+		chrome.runtime.sendMessage({
+			action: 'xhttp',
+			options: options
+		}, function(ret) {
+			if (!ret || !!ret.error) {
+				error(ret ? ret.error : null);
+			} else {
+				success(ret.text);
+			}
+		});
+	}
+
+	exports.getJSON = function(options, success, error){
+		exports.getPage(options, function(text){
+			success(JSON.parse(text));
+		}, error);
+	}
+
 	exports.insertClip = function(useIframe, clipSrc, $target) {
 		if (!!useIframe) {
 			$("<iframe allowfullscreen frameborder='0' scrolling='no' style='width:640px;height:360px;margin-left:-16px' />")
@@ -40,7 +59,7 @@ window.Util_ = window.Util_ || (function($){
 			
 			var $src = $anchor;
 			!!src && ($src = $src.find(src));
-			var clipSrc = $src.attr(srcAttr);
+			var clipSrc = $src.attr(srcAttr).replace("http://", "https://");
 			
 			var $target = $anchor;
 			!!target && ($target = $target.find(target).first());

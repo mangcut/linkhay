@@ -343,14 +343,14 @@ window.Previewer_ = window.Previewer_ || (function($){
 	}
 	
 	var load = function(url, site){
-		$.get({
-			url: url,
-			dataType: "html"
-		}).fail(function(jqXHR, textStatus, errorThrown){
-			console.log(textStatus + " (" + jqXHR.status + "): " + errorThrown);
-			console.log(url);
-		}).done(function(html){
+		//$.get({
+		Util_.getPage({
+			url: url
+		}, function(html){
 			process(html, site, url);
+		}, function(errorThrown){
+			console.log(errorThrown);
+			console.log(url);
 		});
 	}
 	
@@ -368,10 +368,10 @@ window.Previewer_ = window.Previewer_ || (function($){
 		
 		// flattern javascript redirect (and meta refresh?)
 		if (url.match(/^(https?:\/\/)?(cafef|cafebiz|kenh14|dantri\.com)\.vn\/news-\d+(\.\w+)?/)) {
-			$.get({
-				url: url,
-				dataType: "html"
-			}).done(function(html){
+			//$.get({
+			Util_.getPage({
+				url: url
+			}, function(html){
 				//var find = html.match(/\<body\s+onload\s*\=\s*"(?:window\.)?location\.href\s*\=\s*'(.+?)'/i);
 				var find = html.match(/(?:window\.)?(?:top\.)?location(?:\.href)?\s*\=\s*'(.+?)'/i);
 				if (!!find) {

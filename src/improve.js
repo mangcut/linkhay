@@ -99,15 +99,20 @@ window.Improver_ = window.Improver_ || (function($){
 	
 	// when submit link, fetch title and description and fill
 	// textboxes as default values
-	var fetchDataForLink = function(text){
-		if (text.match(/https?\:\/\/([^\/\.:?#]+)\.([^\/\.:?#]+)/i)) {
-			
-			// change focus right away to let thumbnail list loads asap
-			if (!!$("#link-post-frm-url").val()) {
-				$("#link-post-frm-desc").focus();
+	var fetchDataForLink = function(text, defaultTitle){
+		// change focus right away to let thumbnail list loads asap
+		if (!!$("#link-post-frm-url").val()) {
+			$("#link-post-frm-desc").focus();
+		}
+
+		if (!text.match(/https?\:\/\/([^\/\.:?#]+)\.([^\/\.:?#]+)/i)) {
+			if (defaultTitle) {
+				$("#link-post-frm-title").val(defaultTitle.split(/[|-]/, 2)[0].trim());
 			}
+		} else {
 			
-			$.get({url:text}).done(function(html){
+			//$.get({url:text}).done(function(html){
+			Util_.getPage({url:text}, function(html) {
 				var site = KnownSites_.get(text);
 				var nodeList = $.parseHTML("<div>" + html + "</div>");
 				var $html = $(nodeList);
@@ -249,7 +254,7 @@ window.Improver_ = window.Improver_ || (function($){
 				if (PageInfo_.query["qvautosubmitlink"]) {
 					$(el).val(PageInfo_.query["qvautosubmitlink"]);
 					window.setTimeout(function(){
-						fetchDataForLink($(el).val());
+						fetchDataForLink($(el).val(), PageInfo_.query["qvautosubmittitle"]);
 					}, 0);
 				}
 				

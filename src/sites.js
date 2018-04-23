@@ -56,7 +56,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		hide: "",
 		dynamic: Util_.clip
 	},
-	
+	/*
 	{
 		domain: "thanhnien.vn",
 		title: ".main-article h1.main-title",
@@ -77,7 +77,29 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 			Util_.doClip($content, ".player-effect", ".video-effect a", "video", ".video-effect", "img, a", false);
 		}
 	},
+	*/
 	
+	{
+		domain: "thanhnien.vn",
+		title: "#storybox h1.details__headline",
+		author: "#storybox .details__author a[title]",
+		date: "#storybox .details__meta time",
+		lead: "#storybox .l-content .sapo",
+		leadImg: "#contentAvatar img",
+		leadImgCaption: "#contentAvatar figure span",
+		content: "#abody",
+		quote: "",
+		infoBox: "table[bordercolor]",
+		p: ">div, table[bordercolor] td>div>div:not(:first)",
+		caption: ".imgcaption, figcaption",
+		media: "table.imagefull, >div:has(>img, >.caption)",
+		remove: ".details__morenews, .article-poll",
+		hide: "",
+		dynamic: function($content) {
+			Util_.doClip($content, ".player-effect", ".video-effect a", "video", ".video-effect", "img, a", false);
+		}
+	},
+
 	{
 		domain: "vnexpress.net/tin-tuc/goc-nhin",
 		title: "#article_detail .the-article-header .title_gn_detail",
@@ -209,8 +231,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 			$content.find(".fmsmedia").each(function(){
 				var $a = $(this).find("a").first();
 				var fakeSrc = $a.attr("href");
-				var clipSrc = fakeSrc.replace("https://vietnamnet.vn/", "http://media3.cdn2.vietnamnet.vn/vod/")
-														.replace("http://vietnamnet.vn/", "http://media3.cdn2.vietnamnet.vn/vod/");
+				var clipSrc = fakeSrc.replace("https://vietnamnet.vn/", "https://media3.cdn2.vietnamnet.vn/vod/")
+														.replace("http://vietnamnet.vn/", "https://media3.cdn2.vietnamnet.vn/vod/");
 				var useIframe = false;
 				var $clipDiv = $(this).closest("div");
 				// remove the thumbnail if any
@@ -653,14 +675,18 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 				var $t = $(this),
 						matches = $t.text().match(/^\[gg_video](\d+)\[\/gg_video]$/);
 				if (!!matches){
-					$.getJSON("http://bna.vn/bna_craw/video.php", {
-						"mode": "get_link",
-						"id": matches[1]
-					}).done(function(data){
+					//$.getJSON("http://bna.vn/bna_craw/video.php", {
+					Util_.getJSON({
+						url: "http://bna.vn/bna_craw/video.php",
+						data: {
+							"mode": "get_link",
+							"id": matches[1]
+						}
+					}, function(data){
 						var url = data.data.links[data.data.links.length - 1].url;
 						Util_.insertClip(false, url, $t.empty());
-					}).fail(function(jqXHR, textStatus, errorThrown){
-						console.log(textStatus + " (" + jqXHR.status + "): " + errorThrown);
+					}, function(errorThrown){
+						console.log(errorThrown);
 						console.log(url);
 						$t.text("Không lấy được video clip.");
 					});
