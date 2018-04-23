@@ -185,7 +185,68 @@ window.Util_ = window.Util_ || (function($){
 		// It is long -> expand depend on number of comments
 		return (commentCount < 5);
 	}
+	
+	/*
+	exports.extractDate = function($date, site){
+		var result = {};
 		
+		var dateObj = null;
+		var dateText = null;
+		if (!!$date) {
+			if (!site.dateAttr){
+				dateText = $date.text();
+				result.text = dateText;
+			} else {
+				dateText = $date.attr(site.dateAttr);
+				var parsedDate = Date.parse(dateText);
+				var dateString = dateText;
+				if (!isNaN(parsedDate)) {
+					dateObj = new Date(parsedDate);
+					dateString = dateObj.toLocaleString();
+				}
+				result.text = dateString;
+			}
+		}
+		
+		if (!dateObj && !!dateText) {
+			var dateMatches = dateText.match(/([0-3]\d?)(?:\/|-)(\d\d?)(?:\/|-)((?:19|20)\d\d)/);
+			if (!!dateMatches && dateMatches.length === 4){
+				dateObj = new Date(dateMatches[3],dateMatches[2]-1,dateMatches[1])
+			}
+		}
+		
+		if (!!dateObj){
+			var dateDiff = parseInt((new Date() - dateObj)/(24*3600*1000));
+			result.diff = dateDiff;
+		}
+	}
+	
+			// TEMPORARY
+		// Will need to refactor into a module soon
+		// "grab" the preview pane from URL only (no need to fetch HTML)
+		// Could be useful for: youtube, facebook video, vimeo, giphy, etc.
+
+		var grabUrl = function(url) {
+			//https?:\/\/(?:\w+\.)?facebook\.com\/[^\/]+\/posts\/(\d+)\/?
+			var matches = url.match(/https?:\/\/(?:\w+\.)?facebook\.com\/[^\/]\/videos\/(\d+)\/?/i);
+			if (!!matches && (matches.length === 2)){
+				var fbID = matches[1];
+				alert(fbID);
+				var tpl = 
+					'<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FK14vn%2Fvideos%2F' +
+					fbID + 
+					'%2F&show_text=0&width=640" width="640" height="360" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
+				$("<div id='qvDiv_' />").html(tpl).appendTo($(".link-summary"));
+				return true;
+			}
+			
+			return false;
+		}
+		
+		if (!!grabUrl(url)) return;
+
+	*/
+	
 	return exports;
 	
 })(jQuery);
