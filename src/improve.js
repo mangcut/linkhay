@@ -10,6 +10,41 @@ window.Improver_ = window.Improver_ || (function($){
 		}
 	}
 
+	var sticker = function(){
+		$(".V2-comments .V2-comment-item .V2-comment-body:contains(*ném tôm*):not(.sticker_done_)").each(function(){
+			var $t = $(this).addClass("sticker_done_");
+			
+			var $i = $("<img />")
+			.css({
+				"height": "160px",
+				"max-width": "100%"
+			})
+			.attr("src", chrome.runtime.getURL('stickers/nem_tom.png'));
+
+			var $sign = $("<i />").addClass("fa fa-bolt");
+			var $tag = $("<span />").addClass("sticker_handle_").text("ném tôm ")
+				.append($sign)
+				.css({
+					"background": "antiquewhite",
+					"margin":"0 2px",
+					"border-radius":"3px",
+					"padding":"2px 6px",
+					"cursor":"pointer"
+				});
+			
+			
+			var $sticker = $("<p />").addClass("sticker_").css("margin", "0.5rem 0").append($i);
+			$tag.after($sticker);
+			var insertedHtml = $tag[0].outerHTML + $sticker[0].outerHTML;
+			$t.html($t.html().replace("*ném tôm*", insertedHtml));
+
+			$t.find(".sticker_handle_").on("click", function(event){
+				event.preventDefault();
+				$t.find(".sticker_").slideToggle("fast");
+			});
+		});
+	}
+
 	/*
 	
 	NOT VERY USEFUL, SO COMMENT OUT
@@ -352,6 +387,15 @@ window.Improver_ = window.Improver_ || (function($){
 		
 		handleAddImage();
 		
+		sticker();
+
+		// convert sticker when user submits comments
+		$(".V2-comments").on("click", ".V2-comment-frm .submit", function(){
+			window.setTimeout(sticker, 1500);
+			// backup, in case of delay :)
+			window.setTimeout(sticker, 6000);
+		});
+
 		/*
 		
 		NOT VERY USEFUL, SO COMMENT OUT

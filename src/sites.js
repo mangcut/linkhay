@@ -192,6 +192,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		hide: ""
 	},
 	
+	/*
 	{
 		domain: "vneconomy.vn",
 		category: ".titleheaderbv span[itemprop='name']",
@@ -202,6 +203,24 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImg: ".leftmaincontentleft .spimgbaiviet img",
 		leadImgCaption: ".leftmaincontentleft .spimgbaivietnote",
 		content: ".leftmaincontentleft .detailsbaiviet, .psamaincontenleft .psaboximage",
+		quote: "",
+		caption: ".psaboxfooterimage, figcaption",
+		media: ".psaboximage",
+		remove: "",
+		hide: ""
+	},
+	*/
+
+	{
+		domain: "vneconomy.vn",
+		category: ".menutop .active",
+		title: "h1.title",
+		author: ".author .name a",
+		date: ".author .time a",
+		lead: ".contentleft .sapo",
+		leadImg: ".contentleft .imgdetail img",
+		leadImgCaption: ".contentleft .avatardesc",
+		content: ".contentleft .contentdetail",
 		quote: "",
 		caption: ".psaboxfooterimage, figcaption",
 		media: ".psaboximage",
@@ -404,7 +423,12 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		caption: "figcaption",
 		media: "figure.insert-center-image",
 		remove: "",
-		hide: ""
+		hide: "",
+		dynamic: function($content, $html) {
+			$html.find("img[data-src]").each(function(){
+				$(this).attr("src", $(this).attr("data-src"));
+			});
+		}
 	},
 	
 	{
@@ -469,8 +493,12 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		remove: "",
 		hide: "",
 		dynamic: function($content, $html) {
-			$html.find("video>source[data-src]:not([src])").each(function(){
-				$(this).attr("src", $(this).attr("data-src"));
+			$html.find("video>source[data-src]:not([src]), .body-video-youtube iframe").each(function(){
+				$(this).attr("src", $(this).attr("data-src"))
+					.css({
+						width: "640px",
+						height: "360px"
+					});
 			});
 		}
 	},
