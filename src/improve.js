@@ -11,36 +11,56 @@ window.Improver_ = window.Improver_ || (function($){
 	}
 
 	var sticker = function(){
-		$(".V2-comments .V2-comment-item .V2-comment-body:contains(*ném tôm*):not(.sticker_done_)").each(function(){
-			var $t = $(this).addClass("sticker_done_");
-			
-			var $i = $("<img />")
-			.css({
-				"height": "160px",
-				"max-width": "100%"
-			})
-			.attr("src", chrome.runtime.getURL('stickers/nem_tom.png'));
+		var map = {
+			"*ném tôm*": "nem_tom.png",
+			"*như luỳnh*": "nhu_luynh.png"
+		}
 
-			var $sign = $("<i />").addClass("fa fa-bolt");
-			var $tag = $("<span />").addClass("sticker_handle_").text("ném tôm ")
-				.append($sign)
-				.css({
-					"background": "antiquewhite",
-					"margin":"0 2px",
-					"border-radius":"3px",
-					"padding":"2px 6px",
-					"cursor":"pointer"
-				});
-			
-			
-			var $sticker = $("<p />").addClass("sticker_").css("margin", "0.5rem 0").append($i);
-			$tag.after($sticker);
-			var insertedHtml = $tag[0].outerHTML + $sticker[0].outerHTML;
-			$t.html($t.html().replace("*ném tôm*", insertedHtml));
+		$(".V2-comments .V2-comment-item .V2-comment-body:not(.sticker_done_)").each(function(){
+			var $t = $(this).addClass("sticker_done_");
+			var text = $t.text().toLowerCase();
+			for (var key in map){
+				if (text.indexOf(key) >= 0) {
+					var plainKey = key.replace(/^\*+|\*+$/g, '');
+					var $i = $("<img />")
+					.css({
+						"height": "160px",
+						"max-width": "100%"
+					})
+					.attr("title", plainKey)
+					.attr("src", chrome.runtime.getURL('stickers/' + map[key]));
+
+					var $sign = $("<i />").addClass("fa fa-bolt");
+					var $tag = $("<span />")
+						.addClass("sticker_handle_")
+						.text(plainKey + " ")
+						.hide()
+						.append($sign)
+						.css({
+							"background": "antiquewhite",
+							"margin":"0 2px",
+							"border-radius":"3px",
+							"padding":"2px 6px",
+							"cursor":"pointer"
+						});
+										
+					var $sticker = $("<p />").addClass("sticker_").css({
+						"margin": "0.5rem 0",
+						"cursor":"pointer"
+					}).append($i);
+					$tag.after($sticker);
+					var insertedHtml = $tag[0].outerHTML + $sticker[0].outerHTML;
+					$t.html($t.html().split(key).join(insertedHtml));
+				}
+			}
 
 			$t.find(".sticker_handle_").on("click", function(event){
 				event.preventDefault();
-				$t.find(".sticker_").slideToggle("fast");
+				$(this).hide().next().slideToggle("fast");
+			});
+			$t.find(".sticker_").on("click", function(event){
+				event.preventDefault();
+				$(this).slideToggle("fast").prev().fadeToggle("fast");
 			});
 		});
 	}
@@ -78,8 +98,8 @@ window.Improver_ = window.Improver_ || (function($){
 	// show domain for links embeded in comments
 	// currently show as "https://goo.gl/iqBdHL" -> hard to spot spam
 	var showLinkDomain = function(){
-		$(".V2-comments .V2-comment-item .V2-comment-body a[href*='//goo.gl/']").each(function(){
-			var $t = $(this);
+		$(".V2-comments .V2-comment-item .V2-comment-body a[href*='//goo.gl/']:not(.domain_done_)").each(function(){
+			var $t = $(this).addClass("domain_done_");
 			var targetUrl = $t.attr("title").split(/[?#]/)[0];
 			var matches = targetUrl.match(/^(?:https?\:\/\/)?([^\/:?#]+)(?::[^\/]+)?(?:\/(.+))?$/i);
 			if (matches) {
@@ -340,7 +360,7 @@ window.Improver_ = window.Improver_ || (function($){
 	var addQVIndicator = function(){
 		var add = function(){
 			$(".V2-link-stream .V2-link-list .V2-link-item .link-info:not(.indicator_done_)").each(function(){
-				var $t = $(this);
+				var $t = $(this).addClass("indicator_done_");
 				// no way to find out the real URL, so use the domain
 				var domain = $t.find("a.source").text();
 				if (!!KnownSites_.getByDomain(domain)) {
@@ -349,24 +369,70 @@ window.Improver_ = window.Improver_ || (function($){
 						.attr("title", "Có bản xem nhanh")
 						.addClass("fa fa-bolt")
 						.appendTo($c);
-					$t.addClass("indicator_done_")
+				}
+
+				if (domain === "linkhay.com") {
+					$t.find(".title a, a.comments").on("click", function(){
+						window.setTimeout(function(){
+							Util_.waitForEl(".V2-popup-detail-scene", 5000, function(){
+								window.setTimeout(improveComments, 500);
+							});
+						}, 1000);
+					})
 				}
 			});
 		};
 
 		add();
 		$(".V2-link-stream .V2-link-list").on("click", ".load-more", function(){
-			window.setTimeout(function(){
-				add();
-			}, 1000);
+			window.setTimeout(add, 1000);
 		});
+	}
+
+	var handleSticker = function(){
+		sticker();
+
+		// convert sticker when user submits comments
+		$(".V2-comments:not(.sticker_event_done_)")
+		.addClass("sticker_event_done_")
+		.on("click", ".V2-comment-frm .submit", function(){
+			window.setTimeout(sticker, 1500);
+			// backup, in case of delay :)
+			window.setTimeout(sticker, 6000);
+		});
+	}
+
+	/*
+			
+	NOT VERY USEFUL, SO COMMENT OUT
+	var handleGiphy = function() {
+		
+		// convert GIF right away
+		giphy();
+		
+		// convert GIF when user submits comments
+		$(".V2-comments:not(.giphy_event_done_)")
+		.addClass("giphy_event_done_")
+		.on("click", ".V2-comment-frm .submit", function(){
+			window.setTimeout(giphy, 1500);
+			// backup, in case of delay :)
+			window.setTimeout(giphy, 10000);
+		});
+	}
+
+	*/
+
+	// should ensure that it is ok to call twice
+	var improveComments = function(){
+		showLinkDomain();
+		handleSticker();
+		//handleGiphy();
 	}
 	
 	var execute = function(url) {
 
 		if (!!PageInfo_.isExternalDetailedPage) {
 			addCustomStyle();
-			showLinkDomain();
 		} else if (!!PageInfo_.isStream) {
 			addQVIndicator();
 		}
@@ -386,31 +452,10 @@ window.Improver_ = window.Improver_ || (function($){
 		}
 		
 		handleAddImage();
-		
-		sticker();
 
-		// convert sticker when user submits comments
-		$(".V2-comments").on("click", ".V2-comment-frm .submit", function(){
-			window.setTimeout(sticker, 1500);
-			// backup, in case of delay :)
-			window.setTimeout(sticker, 6000);
-		});
-
-		/*
-		
-		NOT VERY USEFUL, SO COMMENT OUT
-		
-		// convert GIF right away
-		giphy();
-		
-		// convert GIF when user submits comments
-		$(".V2-comments").on("click", ".V2-comment-frm .submit", function(){
-			window.setTimeout(giphy, 1500);
-			// backup, in case of delay :)
-			window.setTimeout(giphy, 10000);
-		});
-		
-		*/
+		if (!PageInfo_.isStream) {
+			improveComments();
+		}
 	}
 	
 	return {

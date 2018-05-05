@@ -761,7 +761,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		quote: "",
 		caption: "figcaption",
 		media: ".infogram-embed",
-		remove: "",
+		remove: ".relation-link",
 		hide: "",
 		dynamic: function($content){
 			$content.children().has(">a")
