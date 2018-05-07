@@ -10,25 +10,14 @@ window.Improver_ = window.Improver_ || (function($){
 		}
 	}
 
-	var sticker = function(){
-		var map = {
-			"*ném tôm*": "nem_tom.png",
-			"*như luỳnh*": "nhu_luynh.png"
-		}
-
+	var _sticker = function(map){
 		$(".V2-comments .V2-comment-item .V2-comment-body:not(.sticker_done_)").each(function(){
 			var $t = $(this).addClass("sticker_done_");
 			var text = $t.text().toLowerCase();
 			for (var key in map){
 				if (text.indexOf(key) >= 0) {
 					var plainKey = key.replace(/^\*+|\*+$/g, '');
-					var $i = $("<img />")
-					.css({
-						"height": "160px",
-						"max-width": "100%"
-					})
-					.attr("title", plainKey)
-					.attr("src", chrome.runtime.getURL('stickers/' + map[key]));
+					var $i = Stickers_.makeTag(map, key);
 
 					var $sign = $("<i />").addClass("fa fa-bolt");
 					var $tag = $("<span />")
@@ -63,6 +52,10 @@ window.Improver_ = window.Improver_ || (function($){
 				$(this).slideToggle("fast").prev().fadeToggle("fast");
 			});
 		});
+	}
+
+	var sticker = function(){
+		Stickers_.loadStickers(_sticker);
 	}
 
 	/*

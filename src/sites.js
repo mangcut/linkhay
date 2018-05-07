@@ -150,12 +150,21 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		content: ".sidebar_1 .content_detail",
 		quote: "",
 		infoBox: "table:not(:has(img, video, iframe))",
-		caption: ".tplCaption .Image, .desc_cation",
+		caption: ".tplCaption .Image, .desc_cation, .parser_title",
 		media: "table, .item_slide_show",
 		remove: ".related_news, .block_tinlienquan_temp, .box_img_video, >p:has(strong a):contains('>> ')",
 		hide: "",
 		dynamic:  function($content) {
+			// old way, seems changed and unnecessary now
 			Util_.clipVNExpress($content);
+
+			// It seems they change the way for clip
+			$content.find(".box_embed_video_parent").each(function(){
+				var src = $(this).find(".box_img_video img").attr("src");
+				if (src) {
+					$(this).find("video").attr("poster", src);
+				}
+			});
 		}
 	},
 	
@@ -169,11 +178,22 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		leadImgCaption: "",
 		content: ".detailCT .fck_detail",
 		quote: "",
-		caption: ".tplCaption .Image, .desc_cation",
+		caption: ".tplCaption .Image, .desc_cation, .parser_title",
 		media: "table, .item_slide_show",
-		remove: "",
+		remove: ".box_img_video",
 		hide: "",
-		dynamic: Util_.clipVNExpress
+		dynamic:  function($content) {
+			// old way, seems changed and unnecessary now
+			Util_.clipVNExpress($content);
+
+			// It seems they change the way for clip
+			$content.find(".box_embed_video_parent").each(function(){
+				var src = $(this).find(".box_img_video img").attr("src");
+				if (src) {
+					$(this).find("video").attr("poster", src);
+				}
+			});
+		}
 	},
 	
 	{
@@ -301,7 +321,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
-		remove: ".link-content-footer",
+		remove: ".link-content-footer, .VCSortableInPreviewMode[type=RelatedNewsBox]",
 		hide: "",
 		dynamic: Util_.clip
 	},
@@ -363,9 +383,11 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		remove: "",
 		hide: "",
 		dynamic: function($content, $html) {
-			var clipSrc = $html.find("#content .player_wrapper script").text().match(/s720:(.*.mp4)/g)[0].substr(7);
+			var text = $html.find("#content .player_wrapper script").text();
+			var clipSrc = text.match(/s720:\s*'(.*.mp4)/)[1];
+			var poster = text.match(/thumbnail:\s*'(.*.(?:jpg|png))/)[1];
 			var useIframe = false;
-			return Util_.insertClip(useIframe, clipSrc, $("<div class='media_' />"));
+			return Util_.insertClip(useIframe, clipSrc, $("<div class='media_' />"), {poster: poster});
 		}
 	},
 	
@@ -386,6 +408,19 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		hide: "",
 		dynamic: function($content, $html) {
 			$html.find("#page-wraper .news-desc .ictnews-lb2").remove();
+			$html.find("iframe[src^='http://video.infonet.vn/embed/']").each(function() {
+				var $t = $(this);
+				var src = $t.attr("src");
+				Util_.getPage({url: src}, function(html){
+					var newSrc = html.match(/s720:\s*'(.*.mp4)/)[1];
+					var newPoster = html.match(/thumbnail:\s*'(.*.(?:jpg|png))/)[1];
+
+					// replace the iframe with the video tag
+					var $div = $("<div />");
+					$t.replaceWith($div);
+					Util_.insertClip(false, newSrc, $div, {poster: newPoster});
+				})
+			});
 		}
 	},
 	

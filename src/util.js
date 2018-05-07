@@ -8,7 +8,7 @@ window.Util_ = window.Util_ || (function($){
 			options: options
 		}, function(ret) {
 			if (!ret || !!ret.error) {
-				error(ret ? ret.error : null);
+				!!error && error(ret ? ret.error : null);
 			} else {
 				success(ret.text);
 			}
@@ -21,12 +21,24 @@ window.Util_ = window.Util_ || (function($){
 		}, error);
 	}
 
-	exports.insertClip = function(useIframe, clipSrc, $target) {
+	exports.tryParseJSON = function(text, df) {
+		var ret = null;
+		try {
+			ret = JSON.parse(text);
+		} catch (e) {
+			console.log(e);
+		}
+
+		return ret || df;
+	}
+
+	exports.insertClip = function(useIframe, clipSrc, $target, options) {
 		if (!!useIframe) {
 			$("<iframe allowfullscreen frameborder='0' scrolling='no' style='width:640px;height:360px;margin-left:-16px' />")
 			.attr("src", clipSrc).prependTo($target);
 		} else {
 			$("<video controls style='width:640px;height:360px' />") // set width/height to anti-splash
+				.attr(options || {})
 				.append($("<source />")
 				.on("error", function(){
 					var $p = $("<p />").addClass("caption_");
