@@ -59,9 +59,9 @@ window.Stickers_ = window.Stickers_ || (function($){
         }
 
         if (value.tag === "video") {
-            !attrs.autoplay && (attrs.autoplay = true);
-            !attrs.loop && (attrs.loop = true);
-            !attrs.muted && (attrs.muted = true);
+            (typeof attrs.autoplay === "undefined") && (attrs.autoplay = true);
+            (typeof attrs.loop === "undefined") && (attrs.loop = true);
+            (typeof attrs.muted === "undefined") && (attrs.muted = true);
         }
 
         return $("<" + value.tag + "/>").css(styles).attr(attrs)
