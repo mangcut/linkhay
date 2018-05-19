@@ -616,6 +616,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		}
 	},
 	
+	/*
 	{
 		domain: "24h.com.vn",
 		title: ".div-baiviet h1.baiviet-title",
@@ -632,6 +633,49 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		remove: ".baiviet-bailienquan, .bv-lq, iframe[src*='/dsp_poll.php?']",
 		hide: "",
 		dynamic: function($content){
+			$content.find(".viewVideoPlay").each(function(){
+				var $t = $(this);
+				var config = $t.find(".zplayerDiv").attr("data-config");
+				$t.empty();
+				if (!config) return;
+				
+				var query = Util_.query(config);
+				if (!query["file"]) return;
+				
+				var files = query["file"].split("***");
+				for (i = files.length-1; i >= 0; i--){
+					Util_.insertClip(false, files[i], $t);
+				}
+				
+				$t.css("padding", "0.5rem");
+				$t.find("video").css("padding", "0.5rem");
+			});
+		}
+	},
+	*/
+
+	{
+		domain: "24h.com.vn",
+		title: ".nwsHt h1.clrTit",
+		author: "",
+		source: "",
+		date: ".nwsHt .updTm",
+		lead: ".nwsHt .ctTp",
+		leadImg: "",
+		leadImgCaption: "",
+		content: ".nwsHt",
+		quote: "",
+		caption: "figcaption",
+		media: ".news-image",
+		remove: ".sbNws, .flRt, .atclTit, .updTm, .baiviet-bailienquan, .bv-lq, iframe[src*='/dsp_poll.php?']",
+		hide: "",
+		dynamic: function($content){
+			$content.find(".news-image").each(function(){
+				var $t = $(this);
+				$t.attr("onclick", null);
+				var originalSrc = $t.attr("data-original");
+				!!originalSrc && $t.attr("src", originalSrc);
+			});
 			$content.find(".viewVideoPlay").each(function(){
 				var $t = $(this);
 				var config = $t.find(".zplayerDiv").attr("data-config");
