@@ -1,8 +1,8 @@
 // look and feel improvements goes here
 window.Improver_ = window.Improver_ || (function($){
 
-	var addCustomStyle = function(){
-		var style = localStorage["qv_.customStyle"];
+	var addCustomStyle = function(styleKey){
+		var style = localStorage["qv_." + (styleKey || "globalStyle")];
 		if (!!style){
 			var tag = document.createElement('style');
 			tag.textContent = style;
@@ -90,8 +90,9 @@ window.Improver_ = window.Improver_ || (function($){
 	
 	// show domain for links embeded in comments
 	// currently show as "https://goo.gl/iqBdHL" -> hard to spot spam
+	// UPDATE: http://tinyurl.com/y9z9ymmq
 	var showLinkDomain = function(){
-		$(".V2-comments .V2-comment-item .V2-comment-body a[href*='//goo.gl/']:not(.domain_done_)").each(function(){
+		$(".V2-comments .V2-comment-item .V2-comment-body a[href*='//tinyurl.com/']:not(.domain_done_)").each(function(){
 			var $t = $(this).addClass("domain_done_");
 			var targetUrl = $t.attr("title").split(/[?#]/)[0];
 			var matches = targetUrl.match(/^(?:https?\:\/\/)?([^\/:?#]+)(?::[^\/]+)?(?:\/(.+))?$/i);
@@ -290,6 +291,10 @@ window.Improver_ = window.Improver_ || (function($){
 						}, 1000);
 					}, 1500);
 				}
+			}, function(){
+				if (defaultTitle) {
+					$("#link-post-frm-title").val(defaultTitle.split(/[|-]/, 2)[0].trim());
+				}
 			});
 		}
 	}
@@ -424,8 +429,9 @@ window.Improver_ = window.Improver_ || (function($){
 	
 	var execute = function(url) {
 
+		addCustomStyle();
 		if (!!PageInfo_.isExternalDetailedPage) {
-			addCustomStyle();
+			addCustomStyle("customStyle");
 		} else if (!!PageInfo_.isStream) {
 			addQVIndicator();
 		}

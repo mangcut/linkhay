@@ -52,7 +52,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
 		media: ".VCSortableInPreviewMode",
-		remove: ".tindnd, .tinlienquan, .link-content-footer, .chisochungkhoan",
+		remove: ".tindnd, .tinlienquan, .link-content-footer, .chisochungkhoan, .boxchuyengiadetail",
 		hide: "",
 		dynamic: Util_.clip
 	},
@@ -91,12 +91,15 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		quote: "",
 		infoBox: "table[bordercolor], .quote",
 		p: ">div, >div>div, table[bordercolor] td>div>div:not(:first)",
-		caption: ".imgcaption, figcaption",
+		caption: ".imgcaption, figcaption, table.video strong",
 		media: "table.imagefull, >div:has(>img, >.caption)",
 		remove: ".details__morenews, .article-poll, article.story",
 		hide: "",
 		dynamic: function($content) {
+			// old clip, seems not used, removed?
 			Util_.doClip($content, ".player-effect", ".video-effect a", "video", ".video-effect", "img, a", false);
+			// new clip
+			Util_.doClip($content, ".cms-video", null, "data-video-src")
 		}
 	},
 
@@ -262,7 +265,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		quote: "",
 		caption: ".image_desc",
 		media: ".fmsmedia, .ImageBox, >div>img, table",
-		remove: ".box-taitro, .inner-article, table:has(.box-event)",
+		remove: ".article-relate, .box-taitro, .inner-article, table:has(.box-event)",
 		hide: "",
 		dynamic: function($content) {
 			var $media = $content.find(".fmsmedia");
@@ -303,7 +306,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption, .LayoutAlbumCaption",
 		media: ".VCSortableInPreviewMode",
-		remove: ".knc-relate-wrapper",
+		remove: ".knc-relate-wrapper, .VCSortableInPreviewMode[type='Vote']",
 		hide: "",
 		dynamic: Util_.clip
 	},
@@ -588,7 +591,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		quote: "blockquote",
 		caption: ".fig, figcaption",
 		media: ".article-photo",
-		remove: ".banner",
+		remove: ".banner, .cms-relate",
 		hide: ""
 	},
 	

@@ -64,7 +64,12 @@ window.Stickers_ = window.Stickers_ || (function($){
             (typeof attrs.muted === "undefined") && (attrs.muted = true);
         }
 
-        return $("<" + value.tag + "/>").css(styles).attr(attrs)
+        var theTag = $("<" + value.tag + "/>").css(styles).attr(attrs)
+        if (value.tag === "video") {
+            theTag.text(key);
+        }
+
+        return theTag;
     }
 
     return {
