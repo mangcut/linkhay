@@ -187,14 +187,14 @@
 	display:block;
 	padding-top: 0.3rem;
 }
-#qvDiv_ div.info-box_, #qvDiv_ table.info-box_ td {
+#qvDiv_ .info-box_, #qvDiv_ .info-box_ td {
 	font-size: 0.9rem;
 	line-height: 1.5;
     padding: 0.7rem;
     border-left: 2px solid lightsalmon;
 	background-color:antiquewhite
 }
-#qvDiv_ div.info-box_ p:first-of-type {
+#qvDiv_ .info-box_ p:first-of-type {
 	padding-top: 0;
 }
 #qvDiv_ .b_ {

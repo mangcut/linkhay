@@ -3,19 +3,19 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	var sites = [
 	{
 		domain: "tuoitre.vn",
-		title: ".detail-content h1.title-2",
+		title: ".content-detail .article-title",
 		author: ".author",
-		date: ".detail-content .tool-bar .date",
-		lead: ".detail-content h2.txt-head",
+		date: ".content-detail .date-time",
+		lead: ".main-content-body .sapo",
 		leadImg: "",
 		leadImgCaption: "",
-		content: ".detail-content .fck",
+		content: "#main-detail-body",
 		quote: "[type='SimpleQuote'], .trichdan",
 		infoBox: ".VCSortableInPreviewMode[type='content']",
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, .caption, .quote_author, figcaption",
 		replaceDesc: "TTO - ",
 		media: ".VCSortableInPreviewMode, .desc_image",
-		remove: "div[type='RelatedOneNews'], div[type='RelatedNews']",
+		remove: ".relate-container, [type='RelatedOneNews']",
 		hide: "",
 		dynamic: Util_.clip
 	},
@@ -139,6 +139,43 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 			var clipSrc = $html.find("#content_script script").text().match(/s720:(.*.mp4)/g)[0].substr(7);
 			var useIframe = false;
 			return Util_.insertClip(useIframe, clipSrc, $("<div class='media_' />"));
+		}
+	},
+
+	{
+		domain: "t.me",
+		keepStyle: true,
+		title: ".tgme_widget_message_link .link_anchor",
+		author: ".tgme_widget_message_owner_name span",
+		source: "",
+		date: ".tgme_widget_message_meta time",
+		dateAttr: "datetime",
+		lead: "#message_video, .link_preview_embed, .tgme_widget_message_link_preview",
+		leadImg: "",
+		leadImgCaption: "",
+		content: ".tgme_widget_message_text",
+		quote: "",
+		caption: "",
+		media: "",
+		remove: "",
+		hide: "",
+		dynamic: function($content, $html) {
+			$html.find("video").attr({
+				controls: true,
+				width: 640,
+				height: 360
+			});
+
+			$html.find(".link_preview_embed_wrap").removeAttr("style");
+			$html.find(".tgme_widget_message_link_preview").addClass("info-box_").css("display", "block");
+			$html.find(".link_preview_description").css("font-weight", 400);
+			$html.find(".link_preview_image, .link_preview_right_image").css({
+				paddingTop: 0,
+				display: "block",
+				backgroundSize: "cover",
+				width: 586,
+				height: 320
+			});
 		}
 	},
 	

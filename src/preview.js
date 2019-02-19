@@ -211,11 +211,13 @@ window.Previewer_ = window.Previewer_ || (function($){
 		}
 		
 		// Clean unwelcomed things
-		$.each([$content, $lead, $leadImg], function(index, $tag){
-			if (!!$tag) {
-				$tag.find("[style]").removeAttr("style");
-			}
-		});
+		if (!site.keepStyle) {
+			$.each([$content, $lead, $leadImg], function(index, $tag){
+				if (!!$tag) {
+					$tag.find("[style]").removeAttr("style");
+				}
+			});
+		}
 		
 		!!site.p && $content.find(site.p).addClass("p_");
 		!!site.quote && $content.find(site.quote).addClass("quote_");
@@ -364,6 +366,11 @@ window.Previewer_ = window.Previewer_ || (function($){
 		
 		if (!!site.replaceUrl) {
 			url = url.replace(site.replaceUrl[0], site.replaceUrl[1]);
+		}
+
+		// turn t.me to embed
+		if (url.indexOf("https://t.me/") === 0 && url.indexOf("embed=1") < 0) {
+			url += "?embed=1";
 		}
 		
 		// flattern javascript redirect (and meta refresh?)
