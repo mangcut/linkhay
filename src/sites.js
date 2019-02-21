@@ -150,8 +150,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		source: "",
 		date: ".tgme_widget_message_meta time",
 		dateAttr: "datetime",
-		lead: "#message_video, .link_preview_embed, .tgme_widget_message_link_preview",
-		leadImg: "",
+		lead: "#message_video, .link_preview_embed, .tgme_widget_message_link_preview, .tgme_widget_message_document_wrap",
+		leadImg: ".tgme_widget_message_photo_wrap",
 		leadImgCaption: "",
 		content: ".tgme_widget_message_text",
 		quote: "",
@@ -159,7 +159,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: "",
 		remove: "",
 		hide: "",
-		dynamic: function($content, $html) {
+		dynamic: function($content, $html, tags) {
 			$html.find("video").attr({
 				controls: true,
 				width: 640,
@@ -167,8 +167,8 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 			});
 
 			$html.find(".link_preview_embed_wrap").removeAttr("style");
-			$html.find(".tgme_widget_message_link_preview").addClass("info-box_").css("display", "block");
-			$html.find(".link_preview_description").css("font-weight", 400);
+			$html.find(".tgme_widget_message_link_preview, .tgme_widget_message_document_wrap").addClass("info-box_").css("display", "block");
+			$html.find(".link_preview_description, .tgme_widget_message_document_extra").css("font-weight", 400);
 			$html.find(".link_preview_image, .link_preview_right_image").css({
 				paddingTop: 0,
 				display: "block",
@@ -176,6 +176,14 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 				width: 586,
 				height: 320
 			});
+			var $a = $html.find(".tgme_widget_message_photo_wrap");
+			if ($a.length) {
+				let src = $a.css("background-image");
+				src = src.substring(5, src.length - 2);
+				const $img = $("<img />").attr("src", src);
+				$img.appendTo(tags.$leadImg);
+				$a.remove();
+			}
 		}
 	},
 	

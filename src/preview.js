@@ -238,7 +238,13 @@ window.Previewer_ = window.Previewer_ || (function($){
 		}
 		!!site.caption && $content.find(site.caption).addClass("caption_");
 		if (!!site.dynamic) {
-			var $newContent = site.dynamic($content, $html);
+			var $newContent = site.dynamic($content, $html, {
+				$title: $title,
+				$date: $date,
+				$lead: $lead,
+				$leadImg: $leadImg,
+				$leadImgCaption: $leadImgCaption
+			});
 			if (($content.length === 0) && !!$newContent && ($newContent.length > 0)) {
 				$content = $newContent;
 			}
