@@ -1,6 +1,7 @@
 window.KnownSites_ = window.KnownSites_ || (function($){
 	
 	var sites = [
+
 	{
 		domain: "tuoitre.vn",
 		title: ".content-detail .article-title",
@@ -15,7 +16,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, .caption, .quote_author, figcaption",
 		replaceDesc: "TTO - ",
 		media: ".VCSortableInPreviewMode, .desc_image",
-		remove: ".relate-container, [type='RelatedOneNews']",
+		remove: ".relate-container, [type='RelatedOneNews'], .VCSortableInPreviewMode[type='Vote']",
 		hide: "",
 		dynamic: Util_.clip
 	},
@@ -37,7 +38,45 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		hide: "",
 		dynamic: Util_.clip
 	},
-	
+
+	{
+		domain: 'cafef.vn',
+		matchHtml: function($html) {
+			return $html.find('a.sp-mag-logo').length;
+		},
+		title: "title",
+		source: ".ttvn-link",
+		author: ".credit-item",
+		date: ".publish-date",
+		lead: "",
+		leadImg: ".sp-cover img",
+		leadImgCaption: "",
+		content: ".sp-detail-maincontent",
+		quote: "",
+		infoBox: ".VCSortableInPreviewMode[type='content'], .VCSortableInPreviewMode[type='credit']",
+		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
+		media: ".VCSortableInPreviewMode:not([type='FirstCharacterv2'])",
+		remove: "",
+		hide: "",
+		dynamic: function($content) {
+			Util_.clip($content);
+			$content.find(".VCSortableInPreviewMode[type='FirstCharacterv2']")
+				.css({
+					float: 'left',
+					marginTop: 18,
+					marginRight: 12
+				});
+			$content.find(".credit-item .credit-text")
+				.css({
+					display: 'inline'
+				});
+			$content.find(".publish-date")
+				.css({
+					paddingLeft: 18
+				});
+		}
+	},
+
 	{
 		domain: "cafef.vn",
 		title: ".totalcontentdetail h1.title",
@@ -192,7 +231,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		title: ".sidebar_1 h1.title_news_detail",
 		author: ".author_mail strong",
 		date: ".sidebar_1 .time",
-		lead: ".sidebar_1 h2.description",
+		lead: ".sidebar_1 .description",
 		leadImg: "",
 		leadImgCaption: "",
 		content: ".sidebar_1 .content_detail",
@@ -337,9 +376,52 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 			});
 		}
 	},
+
+	{
+		domain: 'kenh14.vn',
+		replaceUrl: ["://m.", "://"],
+		matchHtml: function($html) {
+			return $html.find('a.sp-mag-logo').length;
+		},
+		title: "title",
+		source: ".cre .top, .ttvn-link",
+		author: ".credit bot, .credit-item",
+		date: ".cre .bot, .publish-date",
+		lead: ".content__subtitle",
+		leadImg: "img.cover-top, .img-pin img",
+		leadImgCaption: "",
+		content: ".sp-detail-maincontent, .content-down",
+		quote: ".quote-type-1, .quote-type-2, .quote-type-3, .quote-type-4, .quote-type-5, .quote-type-6",
+		infoBox: ".sub-title, .des, .VCSortableInPreviewMode[type='content'], .credit, .VCSortableInPreviewMode[type='credit']",
+		caption: ".PhotoCMS_Caption, .VideoCMS_Caption, .StarNameCaption, figcaption",
+		media: ".VCSortableInPreviewMode",
+		remove: ".quote_ br",
+		hide: "",
+		dynamic: function($content) {
+			Util_.clip($content);
+			$content.find('.credit .info div').css({
+				display: 'inline'
+			});
+			$content.find(".VCSortableInPreviewMode[type='FirstCharacterv2']")
+			.css({
+				float: 'left',
+				marginTop: 18,
+				marginRight: 12
+			});
+			$content.find(".credit-item .credit-text")
+				.css({
+					display: 'inline'
+				});
+			$content.find(".publish-date")
+				.css({
+					paddingLeft: 18
+				});
+		}
+	},
 	
 	{
 		domain: "kenh14.vn",
+		replaceUrl: ["://m.", "://"],
 		title: ".klw-body-top .kbwc-header h1.kbwc-title",
 		author: "",
 		date: ".klw-body-top .kbwc-header .kbwcm-time",
@@ -376,13 +458,13 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	
 	{
 		domain: "news.zing.vn",
-		title: ".main .the-article-header h1.the-article-title",
-		author: ".main .the-article-credit .author",
-		date: ".main .the-article-header .the-article-publish",
-		lead: ".main .the-article-summary",
+		title: ".the-article .the-article-header h1.the-article-title",
+		author: ".the-article .the-article-credit .author",
+		date: ".the-article .the-article-header .the-article-publish",
+		lead: ".the-article .the-article-summary",
 		leadImg: "",
 		leadImgCaption: "",
-		content: ".main .the-article-body",
+		content: ".the-article .the-article-body",
 		quote: "",
 		caption: "figcaption, .pCaption, .caption",
 		media: "table.picture, figure.video",
@@ -642,26 +724,26 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	
 	{
 		domain: "tinhte.vn/threads",
-		title: ".thread-cover .title",
-		author: ".thread-cover .author .username",
+		title: ".bdImage_coverContainer .title",
+		author: ".bdImage_coverContainer .author .username",
 		source: "",
-		date: ".thread-cover .description .DateTime",
+		date: ".bdImage_coverContainer .description .DateTime",
 		lead: ".main-article .article-sapo",
-		leadImg: ".thread-cover img.cover",
+		leadImg: ".bdImage_coverContainer img.cover",
 		leadImgCaption: "", //".thread-cover .description",
-		content: "#messageList .messageText",
+		content: "#messageList .message:first-child .messageText",
 		quote: "",
 		caption: "figcaption",
 		media: "",
 		remove: "",
 		hide: "",
-		dynamic: function($content, $html) {
-			$content.addClass("p_");
-			var $img = $html.find(".thread-cover img.cover");
-			var src = $img.css("background-image");
-			src = src.substring(5, src.length - 2);
-			$img.attr("src", src);
-		}
+		//dynamic: function($content, $html) {
+			// $content.addClass("p_");
+			// var $img = $html.find(".bdImage_coverContainer img.cover");
+			// var src = $img.css("background-image");
+			// src = src.substring(5, src.length - 2);
+			// $img.attr("src", src);
+		//}
 	},
 	
 	/*
@@ -924,13 +1006,23 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 	];
 	
 
-	var get = function(url){
+	var get = function(url, $html){
 		var i, match;
 		for (i=0; i<sites.length; i++){
 			match = sites[i].match || sites[i].domain;
-			if (url.indexOf("." + match + "/") >= 0 ||
-					url.indexOf("/" + match + "/") >= 0){
-						return sites[i];
+			var matchUrl = false;
+			if (typeof match.test !== 'function') {
+				matchUrl = url.indexOf("." + match + "/") >= 0 ||
+				url.indexOf("/" + match + "/") >= 0;
+			} else {
+				matchUrl = match.test(url);
+			}
+			var matchHtml = true;
+			if ($html && sites[i].matchHtml) {
+				matchHtml = !!sites[i].matchHtml($html);
+			}
+			if (matchUrl && matchHtml){
+				return sites[i];
 			}
 		}
 		
@@ -944,6 +1036,9 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 			domain = domain.substr(6);
 		}
 		for (var i=0; i<sites.length; i++){
+			if (!sites[i].domain) {
+				continue;
+			}
 			if (domain === sites[i].domain ||
 					domain.endsWith("." + sites[i].domain)){
 				return sites[i];

@@ -156,7 +156,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 		$img.on("click", function(e){
 				e.preventDefault();
 				var src = null;
-				var $lb = $(this).parent("a[rel='lightbox'], a.detail-img-lightbox");
+				var $lb = $(this).parent("a[rel='lightbox'], a[data-lightbox], a.detail-img-lightbox, a.fancybox");
 				if ($lb.length === 1){
 					src = $lb.attr("href");
 				}
@@ -171,6 +171,13 @@ window.Previewer_ = window.Previewer_ || (function($){
 		var nodeList = $.parseHTML("<div>" + html + "</div>", null, !!site.keepScripts);
 		var $html = $(nodeList);
 		
+		if (site.matchHtml) {
+			site = KnownSites_.get(url, $html);
+			if (site.replaceUrl) {
+				url = url.replace(site.replaceUrl[0], site.replaceUrl[1]);
+			}
+		}
+
 		fixSrc($html, site, url);
 		
 		var $title = $html.find(site.title).first();
@@ -398,7 +405,7 @@ window.Previewer_ = window.Previewer_ || (function($){
 				}
 			});
 		} else {
-			load(url,site);
+			load(url, site);
 		}
 	}
 	
