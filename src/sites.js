@@ -239,9 +239,9 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		infoBox: "table:not(:has(img, video, iframe))",
 		caption: ".tplCaption .Image, .desc_cation, .parser_title",
 		media: "table, .item_slide_show",
-		remove: ".related_news, .block_tinlienquan_temp, .box_img_video, >p:has(strong a):contains('>> ')",
+		remove: ".wrap_xemthem, .related_news, .block_tinlienquan_temp, .box_img_video, >p:has(strong a):contains('>> ')",
 		hide: "",
-		dynamic:  function($content) {
+		dynamic:  function($content, $html) {
 			// old way, seems changed and unnecessary now
 			Util_.clipVNExpress($content);
 
@@ -251,6 +251,10 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 				if (src) {
 					$(this).find("video").attr("poster", src);
 				}
+			});
+
+			$html.find("img[data-src]").each(function(){
+				$(this).attr("src", $(this).attr("data-src"));
 			});
 		}
 	},
@@ -492,7 +496,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		media: ".VCSortableInPreviewMode",
 		remove: ".knc-relate-wrapper, .link-content-footer",
 		hide: "",
-		dynamic: Util_.clip
+		dynamic: Util_.clipGenk
 	},
 	
 	{
@@ -681,7 +685,7 @@ window.KnownSites_ = window.KnownSites_ || (function($){
 		quote: "",
 		caption: ".fig, figcaption",
 		media: "table.contentimg",
-		remove: "article.story",
+		remove: "article.story, .position-code, .qc-item",
 		hide: ""
 	},
 	

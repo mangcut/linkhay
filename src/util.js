@@ -63,15 +63,23 @@ window.Util_ = window.Util_ || (function($){
 	exports.clip = function($content){
 		exports.doClip($content, "div[type='VideoStream']", null, "data-src", "div", "img, a", true);
 	}
+
+	exports.clipGenk = function($content) {
+		exports.doClip($content, "div[type='VideoStream']", null, "data-vid", "div", "img, a", false, "http://hls.mediacdn.vn/");
+	}
 	
-	exports.doClip = function($content, anchor, src, srcAttr, target, thumbnail, useIframe){
+	exports.doClip = function($content, anchor, src, srcAttr, target, thumbnail, useIframe, srcDomain){
 		// now check for embeded video
 		$content.find(anchor).each(function(){
 			var $anchor = $(this);
 			
 			var $src = $anchor;
 			!!src && ($src = $src.find(src));
-			var clipSrc = $src.attr(srcAttr).replace("http://", "https://");
+			var clipSrc = $src.attr(srcAttr);
+			
+			if (!clipSrc) return;
+
+			clipSrc = ((srcDomain || '') + clipSrc).replace("http://", "https://");
 			
 			var $target = $anchor;
 			!!target && ($target = $target.find(target).first());
